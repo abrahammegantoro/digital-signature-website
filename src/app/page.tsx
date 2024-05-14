@@ -4,8 +4,8 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="bg-white h-screen">
-      <div className="grid grid-cols-2">
+    <div className="w-full">
+      <div className="grid grid-cols-2 space-x-3">
         <DSTextField label="Name" name="name" />
         <DSTextField label="Name" name="name" />
       </div>
