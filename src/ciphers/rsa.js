@@ -1,3 +1,5 @@
+// RSA GENERATOR FOR SIGNATURE
+
 import random from "crypto-random-prime";
 
 function gcd(a, b) {
@@ -10,7 +12,7 @@ export function generateKeys(bits) {
   const q = BigInt(random(bits));
   const n = p * q;
   const phi = (p - BigInt(1)) * (q - BigInt(1));
-  const commonExponents = [BigInt(3), BigInt(5), BigInt(17), BigInt(257)]; // Commonly used small prime exponents
+  const commonExponents = [BigInt(3), BigInt(5), BigInt(17), BigInt(257)];
   let e = BigInt(
     commonExponents[Math.floor(Math.random() * commonExponents.length)]
   );
@@ -59,3 +61,39 @@ export function crypt(data, key, n) {
 
   return result;
 }
+
+// EXAMPLE USAGE
+
+// DIGITAL SIGNATURE
+// export function exampleDigitalSignature() {
+//   console.log('Example for digital signature');
+//   let key = generateKeys(24);
+//   console.log(key);
+
+//   let message = "signed by the pr3s1d3nt";
+
+//   let encryptedMessage = "";
+//   let decryptedMessage = "";
+
+//   for (let i = 0; i < message.length; i++) {
+//     const messageChar = message.charCodeAt(i);
+//     const encryptedChar = crypt(
+//       messageChar,
+//       BigInt(key.privateKey),
+//       BigInt(key.publicKey[1])
+//     );
+//     const decryptChar = crypt(
+//       encryptedChar,
+//       BigInt(key.publicKey[0]),
+//       BigInt(key.publicKey[1])
+//     );
+//     encryptedMessage += encryptedChar.toString();
+//     decryptedMessage += String.fromCharCode(Number(decryptChar));
+//   }
+
+//   console.log(encryptedMessage);
+//   console.log(decryptedMessage);
+
+// };
+
+// exampleDigitalSignature();
