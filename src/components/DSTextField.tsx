@@ -27,7 +27,6 @@ const DSTextField = React.forwardRef<
     },
     ref
   ) => {
-    const errorMessage = error?.message || errors?.[name]?.message;
     return (
       <div id={id} key={key} className={className}>
         {!(typeof label === "boolean" && !label) && (
@@ -35,27 +34,19 @@ const DSTextField = React.forwardRef<
             <Label htmlFor={name}>{label || name}</Label>
           </div>
         )}
-        <Tooltip
-          className={classNames(hideHelperText && (errorMessage || helperText) ? "block" : "hidden")}
-          content={errorMessage || helperText}
-        >
-          <TextInput
-            type={type}
-            id={name}
-            name={name}
-            placeholder={placeholder || `Enter ${label || name}`}
-            color={Boolean(error || errors?.[name]) ? "failure" : ""}
-            // helperText={!hideHelperText && (
-            //   <div>
-            //     <small className="font-medium">{helperText}</small>
-            //     {errorMessage && <small className="font-medium">{errorMessage}</small>}
-            //   </div>
-            // )}
-            ref={ref}
-            className={`${inputClass} text-black`}
-            {...rest}
-          />
-        </Tooltip>
+        <TextInput
+          type={type}
+          id={name}
+          name={name}
+          placeholder={placeholder || `Enter ${label || name}`}
+          color={Boolean(error || errors?.[name]) ? "failure" : ""}
+          helperText={!hideHelperText && (
+              <small className="font-medium text-gray-400">{helperText}</small>
+          )}
+          ref={ref}
+          className={classNames(inputClass, "text-black w-full")}
+          {...rest}
+        />
       </div>
     );
   }
