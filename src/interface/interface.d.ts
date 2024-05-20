@@ -19,10 +19,10 @@ export interface SelectOptionEnum {
 export interface SelectOption {
   value: string | number;
   label: string;
-};
+}
 
-export interface SelectInputProps<> extends InputProps {
+export interface SelectInputProps<>extends InputProps {
   autoCase?: "capital" | "camel" | "snake" | "kebab" | "constant";
-  options: SelectOptionEnum | SelectOption[] | (string | number)[];
+  options: { [key: string]: string };
   enablePlaceholder?: boolean;
 }

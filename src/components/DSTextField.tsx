@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import classNames from "classnames";
 import { Label, TextInput, TextInputProps, Tooltip } from "flowbite-react";
 import React from "react";
@@ -40,9 +40,11 @@ const DSTextField = React.forwardRef<
           name={name}
           placeholder={placeholder || `Enter ${label || name}`}
           color={Boolean(error || errors?.[name]) ? "failure" : ""}
-          helperText={!hideHelperText && (
+          helperText={
+            !hideHelperText && (
               <small className="font-medium text-gray-400">{helperText}</small>
-          )}
+            )
+          }
           ref={ref}
           className={classNames(inputClass, "text-black w-full")}
           {...rest}
