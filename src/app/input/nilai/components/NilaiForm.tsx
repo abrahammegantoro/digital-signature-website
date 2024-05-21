@@ -96,7 +96,6 @@ export default function NilaiForm({
 
   useEffect(() => {
     const newIPK = calculateIPK(watchMatkul);
-    console.log(newIPK);
     setValue("ipk", parseFloat(newIPK.toFixed(2)));
   }, [watchMatkul, setValue]);
 

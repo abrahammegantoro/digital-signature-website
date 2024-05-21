@@ -1,7 +1,5 @@
 import NilaiForm from "./components/NilaiForm";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 const getMahasiswa = async () => {
   try {

@@ -1,8 +1,6 @@
 import { NilaiMahasiswa } from "@/interface/interface";
 import DataMahasiswa from "./components/DataMahasiswa";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 const getNilaiMahasiswa = async () => {
   try {
