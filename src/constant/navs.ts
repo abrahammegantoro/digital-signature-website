@@ -2,7 +2,7 @@ import { IconType } from "react-icons";
 import { HiDatabase } from "react-icons/hi";
 import { LuTextCursorInput } from "react-icons/lu";
 import { IoBook, IoPerson } from "react-icons/io5";
-import { MdClass } from "react-icons/md";
+import { MdClass, MdKey } from "react-icons/md";
 
 export interface SidebarItem {
   href: string;
@@ -46,4 +46,10 @@ export const sidebarItems: (SidebarGroup | SidebarItem)[] = [
       },
     ]
   },
+  {
+    href: "/generate-key",
+    title: "Generate RSA Key",
+    icon: MdKey
+  }
+
 ];
