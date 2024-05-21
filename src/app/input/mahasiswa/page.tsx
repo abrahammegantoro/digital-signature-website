@@ -29,7 +29,6 @@ export default function Page() {
   });
 
   const onSubmit = async (data: StudentType) => {
-    console.log(data)
     const loadingToast = toast.loading("Submitting data...");
     try {
       const response = await fetch("/api/students", {
