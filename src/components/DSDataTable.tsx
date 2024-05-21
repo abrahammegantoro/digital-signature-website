@@ -62,6 +62,8 @@ enum PredefinedKeys {
     ACTIONS = "actions",
 }
 
+const removeUnderscore = (key: string) => key.replace(/_/g, " ");
+
 export default function DSDataTable<T>(props: Props<T>) {
     const pathname = usePathname()
     const {
@@ -223,7 +225,7 @@ export default function DSDataTable<T>(props: Props<T>) {
                                 {column.key === PredefinedKeys.CHECK ? (
                                     <Checkbox onChange={handleCheckAll} />
                                 ) : (
-                                    column.label
+                                    removeUnderscore(column.label as string)
                                 )}
                             </Table.HeadCell>
                         ))}

@@ -3,7 +3,6 @@
 import DSTextField from "@/components/DSTextField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "flowbite-react";
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
