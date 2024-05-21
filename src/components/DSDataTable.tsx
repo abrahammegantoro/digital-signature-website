@@ -208,7 +208,7 @@ export default function DSDataTable<T>(props: Props<T>) {
                     </div>
                 )}
                 <div className="ml-auto flex gap-3">
-                    <DSConditionalLink to={pathname + "/add"} disabled={Boolean(onAdd)}>
+                    <DSConditionalLink to="/input/nilai" disabled={Boolean(onAdd)}>
                         <Button className="flex items-center justify-center">
                             <HiPlus />
                             Add Data
