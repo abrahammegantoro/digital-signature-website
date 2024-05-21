@@ -3,7 +3,9 @@
 import DSTextField from "@/components/DSTextField";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "flowbite-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
 
 const StudentScheme = z.object({
@@ -26,8 +28,27 @@ export default function Page() {
     },
   });
 
-  const onSubmit = (data: StudentType) => {
-    console.log(data);
+  const onSubmit = async (data: StudentType) => {
+    const loadingToast = toast.loading("Submitting data...");
+    try {
+      const response = await fetch("/api/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit data");
+      }
+
+      const result = await response.json();
+      toast.success(result.message, {id: loadingToast});
+      
+    } catch (error) {
+      toast.error("Failed to submit data", {id: loadingToast});
+    }
   };
   return (
     <div>

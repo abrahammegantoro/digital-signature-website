@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeModeScript } from "flowbite-react";
@@ -9,6 +9,7 @@ import ExampleSidebar from "@/components/Sidebar";
 import classNames from "classnames";
 import { PropsWithChildren } from "react";
 import ExampleNavbar from "@/components/Navbar";
+import ToasterContext from "@/context/ToasterContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default function RootLayout({
         <ThemeModeScript />
       </head>
       <body className={inter.className}>
+        <ToasterContext />
         <SidebarProvider>
           <ExampleNavbar />
           <div className="flex items-start bg-white dark:bg-gray-900 dark:text-white">

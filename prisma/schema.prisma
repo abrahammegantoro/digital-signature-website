@@ -13,22 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum INDEKS {
+  A
+  AB
+  B
+  BC
+  C
+  D
+  E
+}
+
 model Mahasiswa {
-  nim        String @id @unique
-  nama       String
-  jumlah_sks Int
-  ipk        Float
+  nim          String @id @unique
+  nama         String
+  jumlah_sks   Int?   @default(0)
+  ipk          Float? @default(0)
+  tanda_tangan String @default("")
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  Nilai Nilai[]
+  Nilai Nilai[] //with length 10
 }
 
 model Nilai {
-  id          Int    @id @default(sequence())
-  nilai       Float
-  ttd_kaprodi String
+  id    Int    @id @default(sequence())
+  nilai INDEKS @default(A)
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
