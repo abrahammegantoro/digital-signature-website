@@ -62,4 +62,6 @@ const DSSelect = forwardRef<HTMLSelectElement, SelectProps & SelectInputProps>(
   }
 );
 
+DSSelect.displayName = "DSSelect";
+
 export default DSSelect;
