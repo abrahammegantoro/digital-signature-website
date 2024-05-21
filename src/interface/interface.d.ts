@@ -23,7 +23,7 @@ export interface SelectOption {
 
 export interface SelectInputProps<>extends InputProps {
   autoCase?: "capital" | "camel" | "snake" | "kebab" | "constant";
-  options: { [key: string]: string };
+  options: { [key: string]: string } | string[];
   enablePlaceholder?: boolean;
 }
 

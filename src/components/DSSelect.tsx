@@ -1,12 +1,6 @@
-import { Label, Select, SelectProps, Tooltip } from "flowbite-react";
-import { useState, forwardRef, ChangeEvent } from "react";
-import {
-  SelectInputProps,
-  SelectOption,
-  SelectOptionEnum,
-} from "@/interface/interface";
-
-import classNames from "classnames";
+import { Label, Select, SelectProps } from "flowbite-react";
+import { forwardRef } from "react";
+import { SelectInputProps } from "@/interface/interface";
 
 const DSSelect = forwardRef<HTMLSelectElement, SelectProps & SelectInputProps>(
   (
@@ -29,6 +23,7 @@ const DSSelect = forwardRef<HTMLSelectElement, SelectProps & SelectInputProps>(
     ref
   ) => {
     const errorMessage = error?.message || errors?.[name]?.message;
+
     return (
       <div id={id} key={key} className={className}>
         <div className="mb-2 block">
@@ -50,11 +45,17 @@ const DSSelect = forwardRef<HTMLSelectElement, SelectProps & SelectInputProps>(
           >
             {placeholder || `Select ${label || name}`}
           </option>
-          {Object.entries(options).map((option, idx) => (
-            <option key={idx} value={option[0]} className="text-black">
-              {option[0] + " - " + option[1]}
-            </option>
-          ))}
+          {Array.isArray(options)
+            ? options.map((option, idx) => (
+                <option key={idx} value={option} className="text-black">
+                  {option}
+                </option>
+              ))
+            : Object.entries(options).map(([key, value], idx) => (
+                <option key={idx} value={key} className="text-black">
+                  {key} - {value}
+                </option>
+              ))}
         </Select>
       </div>
     );
