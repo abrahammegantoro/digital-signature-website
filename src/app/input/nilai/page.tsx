@@ -22,15 +22,36 @@ const getMahasiswa = async () => {
   }
 }
 
+const getMataKuliah = async () => {
+  try {
+    const result = await prisma.mataKuliah.findMany({
+      select: {
+        kode_mata_kuliah: true,
+        nama_mata_kuliah: true,
+      }
+    });
+    
+    const mataKuliahDict = result.reduce((acc, curr) => {
+      acc[curr.kode_mata_kuliah] = curr.nama_mata_kuliah;
+      return acc;
+    }, {} as { [key: string]: string });
+
+    return mataKuliahDict;
+  } catch (error) {
+    console.error("Error getting data:", error);
+  }
+}
+
 export default async function FormInput() {
-  const data = await getMahasiswa();
-  if (!data) {
+  const dataMahasiswa = await getMahasiswa();
+  const dataMataKuliah = await getMataKuliah();
+  if (!dataMahasiswa || !dataMataKuliah) {
     return <div>Failed to fetch data</div>;
   }
   
   return (
     <div>
-      <NilaiForm mahasiswa={data}/>
+      <NilaiForm mahasiswa={dataMahasiswa} mataKuliah={dataMataKuliah}/>
     </div>
   );
 }

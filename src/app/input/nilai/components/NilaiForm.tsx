@@ -45,11 +45,11 @@ const StudentScheme = z.object({
 
 type StudentType = z.infer<typeof StudentScheme>;
 
-type ResponseMahasiswaType = {
+type ResponseType = {
   [key: string]: string;
 };
 
-export default function NilaiForm({ mahasiswa }: { mahasiswa: ResponseMahasiswaType}) {
+export default function NilaiForm({ mahasiswa, mataKuliah }: { mahasiswa: ResponseType, mataKuliah: ResponseType }) {
   const {
     control,
     register,
