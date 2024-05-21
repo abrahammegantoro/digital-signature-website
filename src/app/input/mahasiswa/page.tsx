@@ -29,6 +29,7 @@ export default function Page() {
   });
 
   const onSubmit = async (data: StudentType) => {
+    console.log(data)
     const loadingToast = toast.loading("Submitting data...");
     try {
       const response = await fetch("/api/students", {
@@ -48,8 +49,10 @@ export default function Page() {
       
     } catch (error) {
       toast.error("Failed to submit data", {id: loadingToast});
+      console.error(error)
     }
   };
+
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)} className="flex gap-4 flex-col">

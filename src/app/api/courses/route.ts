@@ -5,17 +5,18 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
-    const { nim, nama } = await req.json();
+    const { kode, nama, sks } = await req.json();
 
-    const student = await prisma.mahasiswa.create({
+    const student = await prisma.mataKuliah.create({
       data: {
-        nim,
-        nama,
+        kode_mata_kuliah: kode,
+        nama_mata_kuliah: nama,
+        sks
       },
     });
 
     return NextResponse.json(
-      { message: "Student data submitted successfully", student },
+      { message: "Course data submitted successfully", student },
       { status: 200 }
     );
   } catch (error) {

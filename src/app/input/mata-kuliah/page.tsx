@@ -12,6 +12,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import DSSelect from "@/components/DSSelect";
+import toast from "react-hot-toast";
 
 const MatkulScheme = z.object({
   kode: z.string().min(1, { message: "Kode is required" }),
@@ -35,7 +36,28 @@ export default function FormInput() {
     },
   });
 
-  const onSubmit: SubmitHandler<MatkulType> = (data) => console.log(data);
+  const onSubmit = async (data: MatkulType) => {
+    const loadingToast = toast.loading("Submitting data...");
+    try {
+      const response = await fetch("/api/courses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit data");
+      }
+
+      const result = await response.json();
+      toast.success(result.message, {id: loadingToast});
+      
+    } catch (error) {
+      toast.error("Failed to submit data", {id: loadingToast});
+    }
+  };
 
   return (
     <div>
