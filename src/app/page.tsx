@@ -1,6 +1,7 @@
 import { NilaiMahasiswa } from "@/interface/interface";
 import DataMahasiswa from "./components/DataMahasiswa";
 import { prisma } from "@/lib/prisma";
+import { decryptDataMahasiswa } from "@/utils/cipher";
 
 const getNilaiMahasiswa = async () => {
   try {
@@ -9,12 +10,12 @@ const getNilaiMahasiswa = async () => {
         Nilai: {
           include: {
             MataKuliah: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
-    const transformResult = result.map(mahasiswa => {
+    const transformResult = result.map((mahasiswa) => {
       const nilaiFields = mahasiswa.Nilai.map((nilai, index) => ({
         [`kode_mk_${index + 1}`]: nilai.kode_mata_kuliah,
         [`nama_matkul_${index + 1}`]: nilai.MataKuliah.nama_mata_kuliah,
@@ -22,12 +23,15 @@ const getNilaiMahasiswa = async () => {
         [`sks_${index + 1}`]: nilai.MataKuliah.sks,
       }));
 
-      const flattenedNilaiFields = nilaiFields.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+      const flattenedNilaiFields = nilaiFields.reduce(
+        (acc, curr) => ({ ...acc, ...curr }),
+        {}
+      );
       for (let i = nilaiFields.length; i < 10; i++) {
-        flattenedNilaiFields[`kode_mk_${i + 1}`] = '-';
-        flattenedNilaiFields[`nama_matkul_${i + 1}`] = '-';
-        flattenedNilaiFields[`nilai_${i + 1}`] = '-';
-        flattenedNilaiFields[`sks_${i + 1}`] = '-';
+        flattenedNilaiFields[`kode_mk_${i + 1}`] = "-";
+        flattenedNilaiFields[`nama_matkul_${i + 1}`] = "-";
+        flattenedNilaiFields[`nilai_${i + 1}`] = "-";
+        flattenedNilaiFields[`sks_${i + 1}`] = "-";
       }
 
       return {
@@ -43,7 +47,7 @@ const getNilaiMahasiswa = async () => {
   } catch (error) {
     console.error("Error getting data:", error);
   }
-}
+};
 
 export default async function Home() {
   const data = await getNilaiMahasiswa();
@@ -51,9 +55,14 @@ export default async function Home() {
     return <div>Failed to fetch data</div>;
   }
 
+  const dataDecrypted = decryptDataMahasiswa(data as NilaiMahasiswa[]);
+
   return (
     <div className="w-full">
-      <DataMahasiswa nilaiMahasiswa={data as NilaiMahasiswa[]}/>
+      <DataMahasiswa
+        nilaiMahasiswaEncrypt={data as NilaiMahasiswa[]}
+        nilaiMahasiswaDecrypt={dataDecrypted as NilaiMahasiswa[]}
+      />
     </div>
   );
 }
