@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { encryptCourseData } from "@/utils/cipher";
 
 export async function POST(req: NextRequest) {
   try {
     const { kode, nama, sks } = await req.json();
 
+    const { encryptedKode, encryptedNama, encryptedSks } = encryptCourseData(kode, nama, sks);
+
     const student = await prisma.mataKuliah.create({
       data: {
-        kode_mata_kuliah: kode,
-        nama_mata_kuliah: nama,
-        sks
+        kode_mata_kuliah: encryptedKode,
+        nama_mata_kuliah: encryptedNama,
+        sks: encryptedSks,
       },
     });
 

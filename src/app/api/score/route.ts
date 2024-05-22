@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { encryptIpkData, encryptMahasiswaData, encryptScoreData } from "@/utils/cipher";
 
 export async function POST(req: NextRequest) {
   try {
     const { nim, matkul, ipk } = await req.json();
 
+    const encryptedNim = encryptMahasiswaData(nim, "dummy").encryptedNim;
+
     const mahasiswaExist = await prisma.mahasiswa.findUnique({
       where: {
-        nim,
+        nim: encryptedNim,
       },
     });
 
@@ -20,26 +23,30 @@ export async function POST(req: NextRequest) {
 
     const deleteNilai = await prisma.nilai.deleteMany({
       where: {
-        nim,
+        nim: encryptedNim,
       },
     });
 
-    const nilaiRecords = matkul.map((mk: { kode: string; nilai: number }) => ({
-      nim: nim,
-      kode_mata_kuliah: mk.kode,
-      nilai: mk.nilai,
-    }));
+    const nilaiRecords = matkul.map((mk: { kode: string; nilai: string }) => {
+      const { encryptedKode, encryptedNilai } = encryptScoreData(mk.kode, mk.nilai);
+      return {
+        nim: encryptedNim,
+        kode_mata_kuliah: encryptedKode,
+        nilai: encryptedNilai,
+      };
+    });
 
     const newNilai = await prisma.nilai.createMany({
       data: nilaiRecords,
     });
 
+    const encryptedIpk = encryptIpkData(ipk);
     const newIpk = await prisma.mahasiswa.update({
       where: {
-        nim,
+        nim: encryptedNim,
       },
       data: {
-        ipk,
+        ipk: encryptedIpk,
       },
     });
 

@@ -1,3 +1,4 @@
+import { decryptCourseData, decryptMahasiswaData } from "@/utils/cipher";
 import NilaiForm from "./components/NilaiForm";
 import { prisma } from "@/lib/prisma";
 
@@ -9,7 +10,13 @@ const getMahasiswa = async () => {
         nama: true,
       },
     });
-    const mahasiswaDict = result.reduce((acc, curr) => {
+
+    const decryptedResult = result.map((item) => {
+      const { nim, nama } = decryptMahasiswaData(item.nim, item.nama);
+      return { nim, nama };
+    });
+
+    const mahasiswaDict = decryptedResult.reduce((acc, curr) => {
       acc[curr.nim] = curr.nama;
       return acc;
     }, {} as { [key: string]: string });
@@ -30,12 +37,25 @@ const getMataKuliah = async () => {
       },
     });
 
-    const mataKuliahDict = result.reduce((acc, curr) => {
+    const decryptedResult = result.map((item) => {
+      const { kode, nama, sks } = decryptCourseData(
+        item.kode_mata_kuliah,
+        item.nama_mata_kuliah,
+        item.sks
+      );
+      return {
+        kode_mata_kuliah: kode,
+        nama_mata_kuliah: nama,
+        sks: Number(sks),
+      };
+    });
+
+    const mataKuliahDict = decryptedResult.reduce((acc, curr) => {
       acc[curr.kode_mata_kuliah] = curr.nama_mata_kuliah;
       return acc;
     }, {} as { [key: string]: string });
 
-    const sksDict = result.reduce((acc, curr) => {
+    const sksDict = decryptedResult.reduce((acc, curr) => {
       acc[curr.kode_mata_kuliah] = curr.sks;
       return acc;
     }, {} as { [key: string]: number });
@@ -55,7 +75,11 @@ export default async function FormInput() {
 
   return (
     <div>
-      <NilaiForm mahasiswa={dataMahasiswa} mataKuliah={dataMataKuliah.mataKuliahDict} sks={dataMataKuliah.sksDict} />
+      <NilaiForm
+        mahasiswa={dataMahasiswa}
+        mataKuliah={dataMataKuliah.mataKuliahDict}
+        sks={dataMataKuliah.sksDict}
+      />
     </div>
   );
 }

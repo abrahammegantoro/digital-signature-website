@@ -27,6 +27,7 @@ export default function FormInput() {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<MatkulType>({
     resolver: zodResolver(MatkulScheme),
     defaultValues: {
@@ -53,7 +54,7 @@ export default function FormInput() {
 
       const result = await response.json();
       toast.success(result.message, {id: loadingToast});
-      
+      reset();      
     } catch (error) {
       toast.error("Failed to submit data", {id: loadingToast});
     }
