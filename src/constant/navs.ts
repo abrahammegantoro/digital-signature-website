@@ -50,6 +50,11 @@ export const sidebarItems: (SidebarGroup | SidebarItem)[] = [
     href: "/generate-key",
     title: "Generate RSA Key",
     icon: MdKey
-  }
+  },
+  {
+    href: "/encrypt-decrypt-pdf",
+    title: "Encrypt/Decrypt PDF",
+    icon: HiDatabase
+  },
 
 ];
