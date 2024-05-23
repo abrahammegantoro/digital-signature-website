@@ -1,58 +1,69 @@
-'use client';
+"use client"
+import React, { useState } from "react";
+import { Button, Label } from "flowbite-react";
+import { FileInput } from "flowbite-react";
+import { decrypt, encrypt } from "@/ciphers/aes";
 
-import React, { useState } from 'react';
-import { encryptFile, decryptFile } from '@/ciphers/aes_file';
-import { Button } from 'flowbite-react';
+export default function EncryptDecryptForm() {
+  const [file, setFile] = useState<File | null>(null);
 
-const FileEncryptDecrypt = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [encryptedData, setEncryptedData] = useState(null);
-
-  const handleFileUpload = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
-
-  const handleEncryptDecrypt = async () => {
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const fileData = event.target.result;
-        if (encryptedData) {
-          const decryptedData = decryptFile(encryptedData);
-          setEncryptedData(null); // Clear encrypted data for decryption
-          prepareDownload(decryptedData, selectedFile.name);
-        } else {
-          const encryptedFile = encryptFile(fileData);
-          setEncryptedData(encryptedFile);
-        }
-      };
-      reader.readAsArrayBuffer(selectedFile);
-      console.log('Selected file:', selectedFile);
-    } else {
-      alert('Please select a file');
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
     }
   };
 
-  const prepareDownload = (data, fileName) => {
-    const blob = new Blob([data], { type: selectedFile.type });
-    const url = URL.createObjectURL(blob);
-    const downloadLink = document.createElement('a');
-    downloadLink.href = url;
-    downloadLink.download = fileName + (encryptedData ? '.encrypted' : '');
-    downloadLink.click();
-    URL.revokeObjectURL(url);
+  const handleEncryption = async () => {
+    if (!file) return;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const encryptedBuffer = encrypt(buffer);
+      downloadFile(encryptedBuffer, `encrypted_${file.name}.pdf`);
+      console.log('File encrypted successfully');
+    } catch (error) {
+      console.error('Encryption error:', error);
+    }
+  };
+
+  const handleDecryption = async () => {
+    if (!file) return;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const decryptedBuffer = decrypt(buffer);
+      downloadFile(decryptedBuffer, `decrypted_${file.name}.pdf`);
+      console.log('File decrypted successfully');
+    } catch (error) {
+      console.error('Decryption error:', error);
+    }
+  };
+
+  const downloadFile = (buffer: Buffer, fileName: string) => {
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    setFile(null);
   };
 
   return (
-    <div className="App">
-      <h1>File Encryption/Decryption</h1>
-      <input type="file" onChange={handleFileUpload} />
-      <button onClick={handleEncryptDecrypt}>
-        {encryptedData ? 'Decrypt' : 'Encrypt'}
-      </button>
-      {encryptedData && <button onClick={() => prepareDownload(encryptedData, selectedFile.name)}>Download</button>}
-    </div>
+    <>
+      <div>
+        <div className="mb-2 block">
+          <Label htmlFor="file-upload" value="Upload file" className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl pr-3" />
+        </div>
+        <FileInput id="file-upload" accept="application/pdf" onChange={handleFileChange} />
+      </div>
+      <div className="grid grid-cols-2 space-x-3 mt-4">
+        <Button onClick={handleEncryption}>Encrypt</Button>
+        <Button color="failure" onClick={handleDecryption}>Decrypt</Button>
+      </div>
+    </>
   );
 }
-
-export default FileEncryptDecrypt;
