@@ -1,81 +1,55 @@
-async function getKeyMaterial(passphrase) {
-    const encoder = new TextEncoder();
-    return crypto.subtle.importKey(
-        "raw",
-        encoder.encode(passphrase),
-        { name: "PBKDF2" },
-        false,
-        ["deriveKey"]
-    );
-  }
+import crypto from 'crypto';
+import fs from 'fs/promises';
 
-async function deriveKey(keyMaterial, salt) {
-    return crypto.subtle.deriveKey(
-        {
-            name: "PBKDF2",
-            salt: salt,
-            iterations: 100000,
-            hash: "SHA-256"
-        },
-        keyMaterial,
-        {
-            name: "AES-GCM",
-            length: 256
-        },
-        true,
-        ["encrypt", "decrypt"]
-    );
-}
-  
-export async function generateAESKeyFromPassphrase(passphrase) {
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    const keyMaterial = await getKeyMaterial(passphrase);
-    const aesKey = await deriveKey(keyMaterial, salt);
-    return { aesKey, salt };
+const algorithm = 'aes-256-ctr';
+let key = 'TEST KEY';
+
+// Generate a 256-bit key from the provided key string
+key = crypto.createHash('sha256').update(String(key)).digest().slice(0, 32);
+
+// ENCRYPT FUNCTION
+const encrypt = (buffer) => {
+    const iv = crypto.randomBytes(16); // Initialization vector
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    const result = Buffer.concat([iv, cipher.update(buffer), cipher.final()]);
+
+    return result;
 }
 
-export async function encryptData(aesKey, data) {
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encryptedData = await crypto.subtle.encrypt(
-        {
-            name: "AES-GCM"
-        },
-        aesKey,
-        data
-    );
-    return { iv, encryptedData };
+// DECRYPT FUNCTION
+const decrypt = (encrypted) => {
+    const iv = encrypted.slice(0, 16); // Extract the IV from the beginning
+    encrypted = encrypted.slice(16); // The rest is the ciphertext
+    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+    const result = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+
+    return result;
 }
 
-export async function decryptData(aesKey, encryptedData) {
-    return crypto.subtle.decrypt(
-        {
-            name: "AES-GCM"
-        },
-        aesKey,
-        encryptedData
-    );
-}
+// FUNCTION TO ENCRYPT FILE
+const encryptFile = async (inputPath, outputPath) => {
+    try {
+        const file = await fs.readFile(inputPath);
+        const encryptedFile = encrypt(file);
+        await fs.writeFile(outputPath, encryptedFile);
+        console.log('File encrypted');
+    } catch (err) {
+        console.error(err.message);
+    }
+};
+
+// FUNCTION TO DECRYPT FILE
+const decryptFile = async (inputPath, outputPath) => {
+    try {
+        const encryptedData = await fs.readFile(inputPath);
+        const decryptedFile = decrypt(encryptedData);
+        await fs.writeFile(outputPath, decryptedFile);
+        console.log('File decrypted');
+    } catch (err) {
+        console.error(err.message);
+    }
+};
 
 // Example usage
-async function main() {
-    const passphrase = "your-secret-passphrase";
-    const dataToEncrypt = "Hello, world!"; // Example data to encrypt
-    const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(dataToEncrypt);
-
-    // Generate AES key from passphrase
-    const { aesKey, salt } = await generateAESKeyFromPassphrase(passphrase);
-
-    // Encrypt data
-    const { iv, encryptedData } = await encryptData(aesKey, dataBuffer);
-    console.log('Encrypted Data:', new Uint8Array(encryptedData));
-
-    // Decrypt data
-    const decryptedDataBuffer = await decryptData(aesKey, encryptedData, iv);
-    const decoder = new TextDecoder();
-    const decryptedData = decoder.decode(decryptedDataBuffer);
-    console.log('Decrypted Data:', decryptedData);
-}
-
-// main();
-  
+// encryptFile('./src/ciphers/bundel.pdf', './src/ciphers/cipher_bundel.pdf');
+// decryptFile('./src/ciphers/cipher_bundel.pdf', './src/ciphers/decipher_bundel.pdf');
