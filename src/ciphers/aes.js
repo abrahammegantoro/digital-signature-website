@@ -17,8 +17,8 @@ const encrypt = (buffer) => {
 
 // DECRYPT FUNCTION
 const decrypt = (encrypted) => {
-    const iv = encrypted.slice(0, 16); // Extract the IV from the beginning
-    const data = encrypted.slice(16); // The rest is the ciphertext
+    const iv = encrypted.slice(0, 16);
+    const data = encrypted.slice(16); 
     const decipher = crypto.createDecipheriv(algorithm, key, iv);
     return Buffer.concat([decipher.update(data), decipher.final()]);
 }
@@ -46,10 +46,6 @@ export async function decryptFile(inputPath, outputPath) {
         console.error(err.message);
     }
 }
-
-// Example usage
-// encryptFile('./src/ciphers/bundel.pdf', './src/ciphers/cipher_bundel.pdf')
-//     .then(() => decryptFile('./src/ciphers/cipher_bundel.pdf', './src/ciphers/decipher_bundel.pdf'));
 
 // // Example usage
 // encryptFile('./src/ciphers/bundel.pdf', './src/ciphers/cipher_bundel.pdf');
