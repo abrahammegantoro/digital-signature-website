@@ -24,8 +24,8 @@ interface ScopedSlots<T> {
 
 interface Item extends Record<string, any> {
     disableDelete?: boolean;
-    disableEdit?: boolean;
-    disableDetail?: boolean;
+    disableVerify?: boolean;
+    disableAssign?: boolean;
     disableActions?: boolean;
 }
 
@@ -46,12 +46,12 @@ interface Props<T> extends TableProps {
     disableMultiActions?: boolean;
     disableCheckboxes?: boolean;
     disableActions?: boolean;
-    disableDetail?: boolean;
-    disableEdit?: boolean;
+    disableAssign?: boolean;
+    disableVerify?: boolean;
     disableDelete?: boolean;
-    onEdit?: (data: T) => any;
+    onVerify?: (data: T) => any;
     onDelete?: (data: T) => any;
-    onDetail?: (data: T) => any;
+    onAssign?: (data: T) => any;
     onAdd?: (data: T) => any;
     showKeys?: boolean;
     title?: string;
@@ -76,14 +76,14 @@ export default function DSDataTable<T>(props: Props<T>) {
         disableMultiActions = false,
         disableActions: disableActionsProp = false,
         disableDelete: disableDeleteProp = false,
-        disableDetail: disableDetailProp = false,
-        disableEdit: disableEditProp = false,
+        disableAssign: disableAssignProp = false,
+        disableVerify: disableVerifyProp = false,
         isPaginated = true,
         onPageChange,
         onSelectedRowIdsChange,
         onDelete,
-        onDetail,
-        onEdit,
+        onAssign,
+        onVerify,
         onAdd,
         showKeys = false,
         title,
@@ -131,7 +131,7 @@ export default function DSDataTable<T>(props: Props<T>) {
         }
         if (
             !disableActionsProp &&
-            (!disableDeleteProp || !disableDetailProp || !disableEditProp)
+            (!disableDeleteProp || !disableAssignProp || !disableVerifyProp)
         ) {
             cols.push({
                 key: "actions",
@@ -233,8 +233,8 @@ export default function DSDataTable<T>(props: Props<T>) {
                     <Table.Body>
                         {items.map((item, index) => {
                             const disableActions = disableActionsProp || item.disableActions;
-                            const disableDetail = disableDetailProp || item.disableDetail;
-                            const disableEdit = disableEditProp || item.disableEdit;
+                            const disableAssign = disableAssignProp || item.disableAssign;
+                            const disableVerify = disableVerifyProp || item.disableVerify;
                             const disableDelete = disableDeleteProp || item.disableDelete;
                             const isSelected = selectedIds.includes(item[key]);
                             return (
@@ -260,46 +260,28 @@ export default function DSDataTable<T>(props: Props<T>) {
                                             ) : column.key === PredefinedKeys.ACTIONS &&
                                                 !disableActions ? (
                                                 <div className="flex space-x-3">
-                                                    {!disableDetail && (
-                                                        <Tooltip content="Detail">
-                                                            <DSConditionalLink
-                                                                to={pathname + "/" + item[key]}
-                                                                disabled={Boolean(onDetail)}
-                                                            >
-                                                                <Button
-                                                                    color="primary"
-                                                                    outline
-                                                                    onClick={() => onDetail && onDetail(item)}
-                                                                >
-                                                                    <HiSearch />
-                                                                </Button>
-                                                            </DSConditionalLink>
-                                                        </Tooltip>
+                                                    {!disableAssign && (
+                                                        <Button
+                                                            onClick={() => onAssign && onAssign(item)}
+                                                        >
+                                                            Assign DS
+                                                        </Button>
                                                     )}
-                                                    {!disableEdit && (
-                                                        <Tooltip content="Edit">
-                                                            <DSConditionalLink
-                                                                to={pathname + "/" + item[key] + "/edit"}
-                                                                disabled={Boolean(onEdit)}
-                                                            >
-                                                                <Button
-                                                                    color="primary"
-                                                                    onClick={() => onEdit && onEdit(item)}
-                                                                >
-                                                                    <HiPencilAlt />
-                                                                </Button>
-                                                            </DSConditionalLink>
-                                                        </Tooltip>
+                                                    {!disableVerify && (
+                                                        <Button
+                                                            color="warning"
+                                                            onClick={() => onVerify && onVerify(item)}
+                                                        >
+                                                            Verify DS
+                                                        </Button>
                                                     )}
                                                     {!disableDelete && onDelete && (
-                                                        <Tooltip content="Delete">
-                                                            <Button
-                                                                color="failure"
-                                                                onClick={() => onDelete(item)}
-                                                            >
-                                                                <HiTrash />
-                                                            </Button>
-                                                        </Tooltip>
+                                                        <Button
+                                                            color="failure"
+                                                            onClick={() => onDelete(item)}
+                                                        >
+                                                            <HiTrash />
+                                                        </Button>
                                                     )}
                                                 </div>
                                             ) : (

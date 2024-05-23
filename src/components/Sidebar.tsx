@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { Dropdown, Sidebar, TextInput, Tooltip } from "flowbite-react";
+import { Sidebar, TextInput } from "flowbite-react";
 import type { FC } from "react";
 import React from "react";
 import { HiAdjustments, HiCog, HiSearch } from "react-icons/hi";

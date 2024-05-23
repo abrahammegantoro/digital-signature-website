@@ -1,21 +1,27 @@
 "use client";
 import DSDataTable from "@/components/DSDataTable";
 import { NilaiMahasiswa } from "@/interface/interface";
-import { ToggleSwitch } from "flowbite-react";
+import { assignDigitalSignature, decryptDataMahasiswa, verifyDigitalSignature } from "@/utils/cipher";
+import { KetuaProgramStudi } from "@prisma/client";
+import { Button, Modal, ToggleSwitch } from "flowbite-react";
 import { useState } from "react";
 import { set } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function DataMahasiswa({
   nilaiMahasiswaEncrypt,
   nilaiMahasiswaDecrypt,
+  kaprodi
 }: {
   nilaiMahasiswaEncrypt: NilaiMahasiswa[];
   nilaiMahasiswaDecrypt: NilaiMahasiswa[];
+  kaprodi: KetuaProgramStudi;
 }) {
+  const router = useRouter();
+
   const [isDataEncrypted, setIsDataEncrypted] = useState(true);
   const [isSignatureEncrypted, setIsSignatureEncrypted] = useState(true);
-  console.log("nilaiMahasiswaEncrypt", nilaiMahasiswaEncrypt);
-  console.log("nilaiMahasiswaDecrypt", nilaiMahasiswaDecrypt);
 
   const mahasiswaEncrypt = nilaiMahasiswaEncrypt.map((mahasiswa) => {
     const { tanda_tangan, ...rest } = mahasiswa;
@@ -44,6 +50,53 @@ export default function DataMahasiswa({
     return { ...mahasiswa, tanda_tangan: dataTandaTangan[index] };
   });
 
+  const [openModal, setOpenModal] = useState(Array(dataShown.length).fill(false));
+
+  const toggleModal = (index: number) => {
+    setOpenModal((prev) => {
+      const newOpenModal = [...prev];
+      newOpenModal[index] = !newOpenModal[index];
+      return newOpenModal;
+    });
+  };
+
+  const handleAssign = async (data: NilaiMahasiswa) => {
+    const loadingToast = toast.loading("Submitting data...");
+    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
+    const digitalSignature = assignDigitalSignature(decryptedData, BigInt(kaprodi.private_key), BigInt(kaprodi.public_key))
+
+    try {
+      const response = await fetch(`/api/digital-signature/${data.nim}`, {
+        method: "PATCH",
+        body: JSON.stringify({ tanda_tangan: digitalSignature }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit data");
+      }
+
+      const result = await response.json();
+      toast.success(result.message, { id: loadingToast });
+      router.refresh();
+    } catch (error) {
+      toast.error("Failed to submit data", { id: loadingToast });
+      console.error("Error saving key:", error);
+    }
+  }
+
+  const handleVerify = (data: NilaiMahasiswa) => {
+    const loadingToast = toast.loading("Submitting data...");
+    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
+    
+    const isVerified = verifyDigitalSignature(decryptedData, decryptedData.tanda_tangan, BigInt(kaprodi.prime_number), BigInt(kaprodi.public_key));
+
+    if (isVerified) {
+      toast.success("Signature Verification Success", { id: loadingToast });
+    } else {
+      toast.error("Signature Verification Failed", { id: loadingToast });
+    }
+  }
+
   return (
     <div className="w-full">
       <div className="flex justify-end gap-4 mb-5">
@@ -64,7 +117,29 @@ export default function DataMahasiswa({
         totalItemsCount={100}
         disableMultiActions
         disableCheckboxes
+        onAssign={(data) => { handleAssign(data) }}
+        onVerify={(data) => { handleVerify(data) }}
+        scopedSlots={{
+          tanda_tangan: (item: NilaiMahasiswa, index: number) => (
+            <>
+              <Button onClick={() => toggleModal(index)}>Lihat Digital Signature</Button>
+              <Modal show={openModal[index]} onClose={() => toggleModal(index)}>
+                <Modal.Header>Digital Signature</Modal.Header>
+                <Modal.Body>
+                  <div className="text-wrap">
+                    <p className="text-base leading-relaxed text-black dark:text-gray-400">
+                      {item.tanda_tangan}
+                    </p>
+                  </div>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button onClick={() => toggleModal(index)}>Close</Button>
+                </Modal.Footer>
+              </Modal>
+            </>
+          )
+        }}
       />
-    </div>
+    </div >
   );
 }

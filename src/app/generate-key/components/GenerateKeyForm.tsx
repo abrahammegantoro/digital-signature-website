@@ -16,7 +16,7 @@ export default function GenerateKeyForm({ kaprodi }: { kaprodi: ResponseType }) 
     const [bits, setBits] = useState(256);
     const [kaprodiId, setKaprodiId] = useState<number>(0);
     const [publicKey, setPublicKey] = useState({ e: BigInt(0), n: BigInt(0) });
-    const [privateKey, setPrivateKey] = useState<number>(0);
+    const [privateKey, setPrivateKey] = useState<BigInt>(BigInt(0));
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -29,12 +29,13 @@ export default function GenerateKeyForm({ kaprodi }: { kaprodi: ResponseType }) 
     const handleSaveKey = async () => {
         const loadingToast = toast.loading("Submitting data...");
         try {
+            const primeNumber = publicKey.e.toString()
             const publicKeyString = publicKey.n.toString();
             const privateKeyString = privateKey.toString();
 
             const response = await fetch(`/api/encrypted/${kaprodiId}`, {
                 method: "PATCH",
-                body: JSON.stringify({ publicKeyString, privateKeyString }),
+                body: JSON.stringify({ primeNumber, publicKeyString, privateKeyString }),
             });
 
             if (!response.ok) {
@@ -48,7 +49,7 @@ export default function GenerateKeyForm({ kaprodi }: { kaprodi: ResponseType }) 
             setBits(256);
             setKaprodiId(0);
             setPublicKey({ e: BigInt(0), n: BigInt(0) });
-            setPrivateKey(0);
+            setPrivateKey(BigInt(0));
         } catch (error) {
             toast.error("Failed to submit data", { id: loadingToast });
             console.error("Error saving key:", error);

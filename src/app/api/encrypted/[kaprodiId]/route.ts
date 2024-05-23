@@ -7,7 +7,7 @@ export async function PATCH(
 ) {
   try {
     const { kaprodiId } = params;
-    const { publicKeyString, privateKeyString } = await req.json();
+    const { primeNumber, publicKeyString, privateKeyString } = await req.json();
 
     const kaprodi = await prisma.ketuaProgramStudi.findUnique({
       where: { id: parseInt(kaprodiId) },
@@ -23,6 +23,7 @@ export async function PATCH(
     const updateKaprodi = await prisma.ketuaProgramStudi.update({
       where: { id: parseInt(kaprodiId) },
       data: {
+        prime_number: parseInt(primeNumber),
         public_key: publicKeyString,
         private_key: privateKeyString,
       },

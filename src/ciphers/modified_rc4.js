@@ -5,7 +5,7 @@
 function extendedVigenereEncrypt(plain, key) {
     const result = [];
     for (let i = 0; i < plain.length; i++) {
-      result.push(String.fromCharCode((plain.charCodeAt(i) + key.charCodeAt(i % key.length)) % 256));
+        result.push(String.fromCharCode((plain.charCodeAt(i) + key.charCodeAt(i % key.length)) % 256));
     }
     return result.join('');
 }

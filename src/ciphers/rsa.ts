@@ -2,12 +2,12 @@
 
 import random from "crypto-random-prime";
 
-function gcd(a, b) {
+function gcd(a: bigint, b: bigint): bigint {
   if (b === BigInt(0)) return a;
   return gcd(b, a % b);
 }
 
-export function generateKeys(bits) {
+export function generateKeys(bits: number) {
   const p = BigInt(random(bits));
   const q = BigInt(random(bits));
   const n = p * q;
@@ -30,7 +30,7 @@ export function generateKeys(bits) {
   };
 }
 
-function modInverse(a, m) {
+function modInverse(a: bigint, m: bigint): bigint {
   let [x, y, gcd] = extendedEuclid(a, m);
   if (gcd !== BigInt(1)) {
     throw new Error("The modular inverse does not exist");
@@ -38,7 +38,7 @@ function modInverse(a, m) {
   return ((x % m) + m) % m;
 }
 
-function extendedEuclid(a, b) {
+function extendedEuclid(a: bigint, b: bigint): [bigint, bigint, bigint] {
   if (b === BigInt(0)) {
     return [BigInt(1), BigInt(0), a];
   }
@@ -46,7 +46,7 @@ function extendedEuclid(a, b) {
   return [y, x - y * (a / b), gcd];
 }
 
-export function crypt(data, key, n) {
+export function crypt(data: number, key: bigint, n: bigint): bigint {
   let result = BigInt(1);
   let base = BigInt(data);
   let exp = key;
