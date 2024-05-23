@@ -1,6 +1,6 @@
 "use client";
 import classNames from "classnames";
-import { Label, TextInput, TextInputProps, Tooltip } from "flowbite-react";
+import { Label, TextInput, TextInputProps } from "flowbite-react";
 import React from "react";
 import { InputProps } from "@/interface/interface";
 // import { get } from "lodash";

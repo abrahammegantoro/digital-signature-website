@@ -49,19 +49,32 @@ const getNilaiMahasiswa = async () => {
   }
 };
 
+const getKaprodi = async () => {
+  try {
+    const result = await prisma.ketuaProgramStudi.findFirst();
+
+    return result;
+  } catch (error) {
+    console.error("Error getting data:", error);
+  }
+}
+
 export default async function Home() {
-  const data = await getNilaiMahasiswa();
-  if (!data) {
+  const dataMahasiswa = await getNilaiMahasiswa();
+  const dataKaprodi = await getKaprodi();
+
+  if (!dataMahasiswa || !dataKaprodi) {
     return <div>Failed to fetch data</div>;
   }
 
-  const dataDecrypted = decryptDataMahasiswa(data as NilaiMahasiswa[]);
+  const dataDecrypted = decryptDataMahasiswa(dataMahasiswa as NilaiMahasiswa[]);
 
   return (
     <div className="w-full">
       <DataMahasiswa
-        nilaiMahasiswaEncrypt={data as NilaiMahasiswa[]}
+        nilaiMahasiswaEncrypt={dataMahasiswa as NilaiMahasiswa[]}
         nilaiMahasiswaDecrypt={dataDecrypted as NilaiMahasiswa[]}
+        kaprodi={dataKaprodi}
       />
     </div>
   );

@@ -54,6 +54,7 @@ model MataKuliah {
 model KetuaProgramStudi {
   id          Int    @id @default(sequence())
   nama        String
+  prime_number Int
   public_key  String
   private_key String
 
