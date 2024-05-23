@@ -23,7 +23,7 @@ interface ScopedSlots<T> {
 }
 
 interface Item extends Record<string, any> {
-    disableDelete?: boolean;
+    disableDownload?: boolean;
     disableVerify?: boolean;
     disableAssign?: boolean;
     disableActions?: boolean;
@@ -42,15 +42,15 @@ interface Props<T> extends TableProps {
     onSelectedRowIdsChange?: (rowData: any) => void;
     selectedRowIds?: (string | number)[];
     key?: string;
-    disableMultiDelete?: boolean;
+    disableMultiDownload?: boolean;
     disableMultiActions?: boolean;
     disableCheckboxes?: boolean;
     disableActions?: boolean;
     disableAssign?: boolean;
     disableVerify?: boolean;
-    disableDelete?: boolean;
+    disableDownload?: boolean;
     onVerify?: (data: T) => any;
-    onDelete?: (data: T) => any;
+    onDownload?: (data: T) => any;
     onAssign?: (data: T) => any;
     onAdd?: (data: T) => any;
     showKeys?: boolean;
@@ -75,13 +75,13 @@ export default function DSDataTable<T>(props: Props<T>) {
         disableCheckboxes = false,
         disableMultiActions = false,
         disableActions: disableActionsProp = false,
-        disableDelete: disableDeleteProp = false,
+        disableDownload: disableDownloadProp = false,
         disableAssign: disableAssignProp = false,
         disableVerify: disableVerifyProp = false,
         isPaginated = true,
         onPageChange,
         onSelectedRowIdsChange,
-        onDelete,
+        onDownload,
         onAssign,
         onVerify,
         onAdd,
@@ -131,7 +131,7 @@ export default function DSDataTable<T>(props: Props<T>) {
         }
         if (
             !disableActionsProp &&
-            (!disableDeleteProp || !disableAssignProp || !disableVerifyProp)
+            (!disableDownloadProp || !disableAssignProp || !disableVerifyProp)
         ) {
             cols.push({
                 key: "actions",
@@ -202,7 +202,7 @@ export default function DSDataTable<T>(props: Props<T>) {
                             href="#"
                             className="inline-flex cursor-pointer justify-center rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                         >
-                            <span className="sr-only">Delete</span>
+                            <span className="sr-only">Download</span>
                             <HiTrash className="text-2xl" />
                         </a>
                     </div>
@@ -235,7 +235,7 @@ export default function DSDataTable<T>(props: Props<T>) {
                             const disableActions = disableActionsProp || item.disableActions;
                             const disableAssign = disableAssignProp || item.disableAssign;
                             const disableVerify = disableVerifyProp || item.disableVerify;
-                            const disableDelete = disableDeleteProp || item.disableDelete;
+                            const disableDownload = disableDownloadProp || item.disableDownload;
                             const isSelected = selectedIds.includes(item[key]);
                             return (
                                 <Table.Row
@@ -275,12 +275,12 @@ export default function DSDataTable<T>(props: Props<T>) {
                                                             Verify DS
                                                         </Button>
                                                     )}
-                                                    {!disableDelete && onDelete && (
+                                                    {!disableDownload && onDownload && (
                                                         <Button
-                                                            color="failure"
-                                                            onClick={() => onDelete(item)}
+                                                            color="success"
+                                                            onClick={() => onDownload(item)}
                                                         >
-                                                            <HiTrash />
+                                                            Download Report
                                                         </Button>
                                                     )}
                                                 </div>

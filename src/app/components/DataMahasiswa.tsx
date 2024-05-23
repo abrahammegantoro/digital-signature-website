@@ -8,6 +8,7 @@ import { useState } from "react";
 import { set } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { generateTranscript } from "@/utils/generateTranscript";
 
 export default function DataMahasiswa({
   nilaiMahasiswaEncrypt,
@@ -87,7 +88,7 @@ export default function DataMahasiswa({
   const handleVerify = (data: NilaiMahasiswa) => {
     const loadingToast = toast.loading("Submitting data...");
     const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
-    
+
     const isVerified = verifyDigitalSignature(decryptedData, decryptedData.tanda_tangan, BigInt(kaprodi.prime_number), BigInt(kaprodi.public_key));
 
     if (isVerified) {
@@ -96,6 +97,27 @@ export default function DataMahasiswa({
       toast.error("Signature Verification Failed", { id: loadingToast });
     }
   }
+
+  const handleDownload = async (data: NilaiMahasiswa) => {
+    const loadingToast = toast.loading("Submitting data...");
+    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
+    try {
+      const pdfBytes = await generateTranscript(decryptedData);
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${decryptedData.nim}_transcript.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success("Transcript downloaded successfully", { id: loadingToast });
+    } catch (error) {
+      toast.error("Failed to download transcript", { id: loadingToast });
+      console.error("Download error:", error);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -115,8 +137,8 @@ export default function DataMahasiswa({
         title="Data Mahasiswa"
         items={dataShown}
         totalItemsCount={100}
-        disableMultiActions
         disableCheckboxes
+        onDownload={(data) => { handleDownload(data) }}
         onAssign={(data) => { handleAssign(data) }}
         onVerify={(data) => { handleVerify(data) }}
         scopedSlots={{

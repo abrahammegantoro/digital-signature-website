@@ -61,39 +61,3 @@ export function crypt(data: number, key: bigint, n: bigint): bigint {
 
   return result;
 }
-
-// EXAMPLE USAGE
-
-// DIGITAL SIGNATURE
-export function exampleDigitalSignature() {
-  console.log('Example for digital signature');
-  let key = generateKeys(24);
-  console.log(key);
-
-  let message = "signed by the pr3s1d3nt#@$%!$";
-
-  let encryptedMessage = "";
-  let decryptedMessage = "";
-
-  for (let i = 0; i < message.length; i++) {
-    const messageChar = message.charCodeAt(i);
-    const encryptedChar = crypt(
-      messageChar,
-      BigInt(key.privateKey),
-      BigInt(key.publicKey[1])
-    );
-    const decryptChar = crypt(
-      encryptedChar,
-      BigInt(key.publicKey[0]),
-      BigInt(key.publicKey[1])
-    );
-    encryptedMessage += encryptedChar.toString();
-    decryptedMessage += String.fromCharCode(Number(decryptChar));
-  }
-
-  console.log(encryptedMessage);
-  console.log(decryptedMessage);
-
-};
-
-exampleDigitalSignature();

@@ -20,7 +20,6 @@ export default function EncryptDecryptForm() {
       const buffer = Buffer.from(arrayBuffer);
       const encryptedBuffer = encrypt(buffer);
       downloadFile(encryptedBuffer, `encrypted_${file.name}.pdf`);
-      console.log('File encrypted successfully');
     } catch (error) {
       console.error('Encryption error:', error);
     }
@@ -33,7 +32,6 @@ export default function EncryptDecryptForm() {
       const buffer = Buffer.from(arrayBuffer);
       const decryptedBuffer = decrypt(buffer);
       downloadFile(decryptedBuffer, `decrypted_${file.name}.pdf`);
-      console.log('File decrypted successfully');
     } catch (error) {
       console.error('Decryption error:', error);
     }
