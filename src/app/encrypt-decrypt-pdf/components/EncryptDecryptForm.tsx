@@ -1,70 +1,69 @@
-"use client";
-
+"use client"
 import React, { useState } from "react";
-import ClientFileInput from './ClientFileInput';
-import { Button } from "flowbite-react";
-import { encryptFile, decryptFile } from '@/ciphers/aes';
+import { Button, Label } from "flowbite-react";
+import { FileInput } from "flowbite-react";
+import { decrypt, encrypt } from "@/ciphers/aes";
 
 export default function EncryptDecryptForm() {
-  const [fileToEncrypt, setFileToEncrypt] = useState(null);
-  const [fileToDecrypt, setFileToDecrypt] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleFileToEncryptChange = (file) => {
-    setFileToEncrypt(file);
-  };
-
-  const handleFileToDecryptChange = (file) => {
-    setFileToDecrypt(file);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
   };
 
   const handleEncryption = async () => {
-    if (!fileToEncrypt) return;
+    if (!file) return;
     try {
-      const encryptedFilePath = './src/ciphers/encrypted_file.pdf';
-      await encryptFile(fileToEncrypt, encryptedFilePath);
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const encryptedBuffer = encrypt(buffer);
+      downloadFile(encryptedBuffer, `encrypted_${file.name}.pdf`);
       console.log('File encrypted successfully');
-
-      // Trigger download of encrypted file
-      downloadFile(encryptedFilePath);
     } catch (error) {
       console.error('Encryption error:', error);
     }
   };
 
   const handleDecryption = async () => {
-    if (!fileToDecrypt) return;
+    if (!file) return;
     try {
-      const decryptedFilePath = './src/ciphers/decrypted_file.pdf';
-      await decryptFile(fileToDecrypt, decryptedFilePath);
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const decryptedBuffer = decrypt(buffer);
+      downloadFile(decryptedBuffer, `decrypted_${file.name}.pdf`);
       console.log('File decrypted successfully');
-
-      // Trigger download of decrypted file
-      downloadFile(decryptedFilePath);
     } catch (error) {
       console.error('Decryption error:', error);
     }
   };
 
-  const downloadFile = (filePath) => {
+  const downloadFile = (buffer: Buffer, fileName: string) => {
+    const blob = new Blob([buffer], { type: 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = filePath;
-    link.setAttribute('download', '');
+    link.href = url;
+    link.setAttribute('download', fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    setFile(null);
   };
 
   return (
-    <div>
-      <form>
-        <h3>Encryption</h3>
-        <ClientFileInput onFileChange={handleFileToEncryptChange} />
-        <Button type="button" className="mt-4" onClick={handleEncryption}>Encrypt PDF</Button>
-        
-        <h3>Decryption</h3>
-        <ClientFileInput onFileChange={handleFileToDecryptChange} />
-        <Button type="button" className="mt-4" onClick={handleDecryption}>Decrypt PDF</Button>
-      </form>
-    </div>
+    <>
+      <div>
+        <div className="mb-2 block">
+          <Label htmlFor="file-upload" value="Upload file" className="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl pr-3" />
+        </div>
+        <FileInput id="file-upload" accept="application/pdf" onChange={handleFileChange} />
+      </div>
+      <div className="grid grid-cols-2 space-x-3 mt-4">
+        <Button onClick={handleEncryption}>Encrypt</Button>
+        <Button color="failure" onClick={handleDecryption}>Decrypt</Button>
+      </div>
+    </>
   );
 }
