@@ -43,7 +43,7 @@ const getNilaiMahasiswa = async () => {
       };
     });
 
-    return transformResult;
+    return transformResult as NilaiMahasiswa[];
   } catch (error) {
     console.error("Error getting data:", error);
   }
@@ -67,13 +67,13 @@ export default async function Home() {
     return <div>Failed to fetch data</div>;
   }
 
-  const dataDecrypted = decryptDataMahasiswa(dataMahasiswa as NilaiMahasiswa[]);
+  const dataDecrypted = decryptDataMahasiswa(dataMahasiswa);
 
   return (
     <div className="w-full">
       <DataMahasiswa
-        nilaiMahasiswaEncrypt={dataMahasiswa as NilaiMahasiswa[]}
-        nilaiMahasiswaDecrypt={dataDecrypted as NilaiMahasiswa[]}
+        nilaiMahasiswaEncrypt={dataMahasiswa}
+        nilaiMahasiswaDecrypt={dataDecrypted}
         kaprodi={dataKaprodi}
       />
     </div>

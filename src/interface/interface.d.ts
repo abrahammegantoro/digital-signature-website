@@ -71,5 +71,5 @@ export interface NilaiMahasiswa {
   nilai_10: string;
   sks_10: string;
   ipk: string;
-  tanda_tangan: string;
+  tanda_tangan: string[];
 }

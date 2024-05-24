@@ -49,9 +49,9 @@ interface Props<T> extends TableProps {
     disableAssign?: boolean;
     disableVerify?: boolean;
     disableDownload?: boolean;
-    onVerify?: (data: T) => any;
+    onVerify?: (data: number) => any;
     onDownload?: (data: T) => any;
-    onAssign?: (data: T) => any;
+    onAssign?: (data: number) => any;
     onAdd?: (data: T) => any;
     showKeys?: boolean;
     title?: string;
@@ -262,7 +262,7 @@ export default function DSDataTable<T>(props: Props<T>) {
                                                 <div className="flex space-x-3">
                                                     {!disableAssign && (
                                                         <Button
-                                                            onClick={() => onAssign && onAssign(item)}
+                                                            onClick={() => onAssign && onAssign(index)}
                                                         >
                                                             Assign DS
                                                         </Button>
@@ -270,7 +270,7 @@ export default function DSDataTable<T>(props: Props<T>) {
                                                     {!disableVerify && (
                                                         <Button
                                                             color="warning"
-                                                            onClick={() => onVerify && onVerify(item)}
+                                                            onClick={() => onVerify && onVerify(index)}
                                                         >
                                                             Verify DS
                                                         </Button>

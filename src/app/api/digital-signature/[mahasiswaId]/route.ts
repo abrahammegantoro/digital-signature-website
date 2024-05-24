@@ -24,7 +24,7 @@ export async function PATCH(
     const updateMahasiswa = await prisma.mahasiswa.update({
       where: { nim: mahasiswaId },
       data: {
-        tanda_tangan: btoa(modifiedRC4Encrypt(tanda_tangan, process.env.NEXT_PUBLIC_VIGENERE_KEY, process.env.NEXT_PUBLIC_RC4_KEY))
+        tanda_tangan: tanda_tangan
       },
     });
 

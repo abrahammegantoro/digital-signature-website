@@ -18,7 +18,7 @@ model Mahasiswa {
   nama         String
   jumlah_sks   String?
   ipk          String?
-  tanda_tangan String  @default("")
+  tanda_tangan String[]
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt

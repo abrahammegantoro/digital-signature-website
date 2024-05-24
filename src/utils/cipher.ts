@@ -68,7 +68,9 @@ export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[]): a
     const decryptedFields = {
       nim: modifiedRC4Decrypt(atob(mahasiswa.nim), VIGENERE_KEY, RC4_KEY),
       nama: modifiedRC4Decrypt(atob(mahasiswa.nama), VIGENERE_KEY, RC4_KEY),
-      tanda_tangan: modifiedRC4Decrypt(atob(mahasiswa.tanda_tangan), VIGENERE_KEY, RC4_KEY),
+      tanda_tangan: mahasiswa.tanda_tangan.map((el) => {
+        return modifiedRC4Decrypt(atob(el), VIGENERE_KEY, RC4_KEY);
+      }),
     };
 
     const decryptedNilaiFields = Array.from({ length: 10 }, (_, index) => {
@@ -78,10 +80,10 @@ export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[]): a
       const sks = mahasiswa[`sks_${index + 1}` as keyof NilaiMahasiswa];
 
       return {
-        [`kode_mk_${index + 1}`]: kode !== '-' ? modifiedRC4Decrypt(atob(kode), VIGENERE_KEY, RC4_KEY) : '-',
-        [`nama_matkul_${index + 1}`]: nama !== '-' ? modifiedRC4Decrypt(atob(nama), VIGENERE_KEY, RC4_KEY) : '-',
-        [`nilai_${index + 1}`]: nilai !== '-' ? modifiedRC4Decrypt(atob(nilai), VIGENERE_KEY, RC4_KEY) : '-',
-        [`sks_${index + 1}`]: sks !== '-' ? Number(modifiedRC4Decrypt(atob(sks), VIGENERE_KEY, RC4_KEY)) : '-',
+        [`kode_mk_${index + 1}`]: kode !== '-' ? modifiedRC4Decrypt(atob(kode.toString()), VIGENERE_KEY, RC4_KEY) : '-',
+        [`nama_matkul_${index + 1}`]: nama !== '-' ? modifiedRC4Decrypt(atob(nama.toString()), VIGENERE_KEY, RC4_KEY) : '-',
+        [`nilai_${index + 1}`]: nilai !== '-' ? modifiedRC4Decrypt(atob(nilai.toString()), VIGENERE_KEY, RC4_KEY) : '-',
+        [`sks_${index + 1}`]: sks !== '-' ? Number(modifiedRC4Decrypt(atob(sks.toString()), VIGENERE_KEY, RC4_KEY)) : '-',
       };
     });
 
@@ -122,25 +124,25 @@ export function assignDigitalSignature(
 
   const hashedMessage = keccakHash(dataString);
 
-  let digitalSignature = "";
+  let digitalSignature: string[] = [];
   for (let i = 0; i < hashedMessage.length; i++) {
     const encryptedChar = crypt(
       BigInt(hashedMessage.charCodeAt(i)),
       privateKey,
       primeNumber
     );
-    digitalSignature += encryptedChar;
+    digitalSignature.push(btoa(modifiedRC4Encrypt(encryptedChar.toString(), VIGENERE_KEY, RC4_KEY)));
   }
-
+  
   return digitalSignature;
 }
 
 export function verifyDigitalSignature(
   data: NilaiMahasiswa,
-  digitalSignature: string,
   publicKey: bigint,
   primeNumber: bigint,
 ) {
+  const digitalSignature = data.tanda_tangan;
   const dataString = Object.keys(data)
     .filter(
       (key) =>
@@ -157,11 +159,11 @@ export function verifyDigitalSignature(
   let decryptedMessage = "";
   for (let i = 0; i < digitalSignature.length; i++) {
     const decryptedChar = crypt(
-      BigInt(digitalSignature.charCodeAt(i)),
+      BigInt(digitalSignature[i]),
       publicKey,
       primeNumber
     );
-    decryptedMessage += decryptedChar;
+    decryptedMessage += String.fromCharCode(Number(decryptedChar));
   }
   
   return hashedMessage === decryptedMessage;

@@ -1,7 +1,11 @@
 "use client";
 import DSDataTable from "@/components/DSDataTable";
 import { NilaiMahasiswa } from "@/interface/interface";
-import { assignDigitalSignature, decryptDataMahasiswa, verifyDigitalSignature } from "@/utils/cipher";
+import {
+  assignDigitalSignature,
+  decryptDataMahasiswa,
+  verifyDigitalSignature,
+} from "@/utils/cipher";
 import { KetuaProgramStudi } from "@prisma/client";
 import { Button, Modal, ToggleSwitch } from "flowbite-react";
 import { useState } from "react";
@@ -13,7 +17,7 @@ import { generateTranscript } from "@/utils/generateTranscript";
 export default function DataMahasiswa({
   nilaiMahasiswaEncrypt,
   nilaiMahasiswaDecrypt,
-  kaprodi
+  kaprodi,
 }: {
   nilaiMahasiswaEncrypt: NilaiMahasiswa[];
   nilaiMahasiswaDecrypt: NilaiMahasiswa[];
@@ -51,7 +55,9 @@ export default function DataMahasiswa({
     return { ...mahasiswa, tanda_tangan: dataTandaTangan[index] };
   });
 
-  const [openModal, setOpenModal] = useState(Array(dataShown.length).fill(false));
+  const [openModal, setOpenModal] = useState(
+    Array(dataShown.length).fill(false)
+  );
 
   const toggleModal = (index: number) => {
     setOpenModal((prev) => {
@@ -61,13 +67,16 @@ export default function DataMahasiswa({
     });
   };
 
-  const handleAssign = async (data: NilaiMahasiswa) => {
+  const handleAssign = async (index: number) => {
     const loadingToast = toast.loading("Submitting data...");
-    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
-    const digitalSignature = assignDigitalSignature(decryptedData, BigInt(kaprodi.private_key), BigInt(kaprodi.prime_number))
+    const digitalSignature = assignDigitalSignature(
+      nilaiMahasiswaDecrypt[index],
+      BigInt(kaprodi.private_key),
+      BigInt(kaprodi.prime_number)
+    );
 
     try {
-      const response = await fetch(`/api/digital-signature/${data.nim}`, {
+      const response = await fetch(`/api/digital-signature/${nilaiMahasiswaEncrypt[index].nim}`, {
         method: "PATCH",
         body: JSON.stringify({ tanda_tangan: digitalSignature }),
       });
@@ -83,29 +92,34 @@ export default function DataMahasiswa({
       toast.error("Failed to submit data", { id: loadingToast });
       console.error("Error saving key:", error);
     }
-  }
+  };
 
-  const handleVerify = (data: NilaiMahasiswa) => {
+  const handleVerify = (index: number) => {
     const loadingToast = toast.loading("Submitting data...");
-    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
 
-    const isVerified = verifyDigitalSignature(decryptedData, decryptedData.tanda_tangan, BigInt(kaprodi.public_key), BigInt(kaprodi.prime_number));
+    const data = nilaiMahasiswaDecrypt[index];
+
+    const isVerified = verifyDigitalSignature(
+      data,
+      BigInt(kaprodi.public_key),
+      BigInt(kaprodi.prime_number)
+    );
 
     if (isVerified) {
       toast.success("Signature Verification Success", { id: loadingToast });
     } else {
       toast.error("Signature Verification Failed", { id: loadingToast });
     }
-  }
+  };
 
   const handleDownload = async (data: NilaiMahasiswa) => {
     const loadingToast = toast.loading("Submitting data...");
     const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
     try {
       const pdfBytes = await generateTranscript(decryptedData);
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = `${decryptedData.nim}_transcript.pdf`;
       document.body.appendChild(link);
@@ -138,19 +152,27 @@ export default function DataMahasiswa({
         items={dataShown}
         totalItemsCount={100}
         disableCheckboxes
-        onDownload={(data) => { handleDownload(data) }}
-        onAssign={(data) => { handleAssign(data) }}
-        onVerify={(data) => { handleVerify(data) }}
+        onDownload={(data) => {
+          handleDownload(data);
+        }}
+        onAssign={(index) => {
+          handleAssign(index);
+        }}
+        onVerify={(index) => {
+          handleVerify(index);
+        }}
         scopedSlots={{
           tanda_tangan: (item: NilaiMahasiswa, index: number) => (
             <>
-              <Button onClick={() => toggleModal(index)}>Lihat Digital Signature</Button>
+              <Button onClick={() => toggleModal(index)}>
+                Lihat Digital Signature
+              </Button>
               <Modal show={openModal[index]} onClose={() => toggleModal(index)}>
                 <Modal.Header>Digital Signature</Modal.Header>
                 <Modal.Body>
                   <div className="text-wrap">
                     <p className="text-base leading-relaxed text-black dark:text-gray-400">
-                      {item.tanda_tangan}
+                      {item.tanda_tangan.join("")}
                     </p>
                   </div>
                 </Modal.Body>
@@ -159,9 +181,9 @@ export default function DataMahasiswa({
                 </Modal.Footer>
               </Modal>
             </>
-          )
+          ),
         }}
       />
-    </div >
+    </div>
   );
 }
