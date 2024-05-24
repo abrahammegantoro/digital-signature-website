@@ -46,9 +46,9 @@ function extendedEuclid(a: bigint, b: bigint): [bigint, bigint, bigint] {
   return [y, x - y * (a / b), gcd];
 }
 
-export function crypt(data: number, key: bigint, n: bigint): bigint {
+export function crypt(data: bigint, key: bigint, n: bigint): bigint {
   let result = BigInt(1);
-  let base = BigInt(data);
+  let base = data;
   let exp = key;
 
   while (exp > BigInt(0)) {

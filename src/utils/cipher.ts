@@ -107,7 +107,7 @@ export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[]): a
 export function assignDigitalSignature(
   data: NilaiMahasiswa,
   privateKey: bigint,
-  publicKey: bigint
+  primeNumber: bigint
 ) {
   const dataString = Object.keys(data)
     .filter(
@@ -125,9 +125,9 @@ export function assignDigitalSignature(
   let digitalSignature = "";
   for (let i = 0; i < hashedMessage.length; i++) {
     const encryptedChar = crypt(
-      hashedMessage.charCodeAt(i),
+      BigInt(hashedMessage.charCodeAt(i)),
       privateKey,
-      publicKey
+      primeNumber
     );
     digitalSignature += encryptedChar;
   }
@@ -138,8 +138,8 @@ export function assignDigitalSignature(
 export function verifyDigitalSignature(
   data: NilaiMahasiswa,
   digitalSignature: string,
+  publicKey: bigint,
   primeNumber: bigint,
-  publicKey: bigint
 ) {
   const dataString = Object.keys(data)
     .filter(
@@ -157,9 +157,9 @@ export function verifyDigitalSignature(
   let decryptedMessage = "";
   for (let i = 0; i < digitalSignature.length; i++) {
     const decryptedChar = crypt(
-      digitalSignature.charCodeAt(i),
-      primeNumber,
-      publicKey
+      BigInt(digitalSignature.charCodeAt(i)),
+      publicKey,
+      primeNumber
     );
     decryptedMessage += decryptedChar;
   }

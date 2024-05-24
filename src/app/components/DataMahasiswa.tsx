@@ -64,7 +64,7 @@ export default function DataMahasiswa({
   const handleAssign = async (data: NilaiMahasiswa) => {
     const loadingToast = toast.loading("Submitting data...");
     const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
-    const digitalSignature = assignDigitalSignature(decryptedData, BigInt(kaprodi.private_key), BigInt(kaprodi.public_key))
+    const digitalSignature = assignDigitalSignature(decryptedData, BigInt(kaprodi.private_key), BigInt(kaprodi.prime_number))
 
     try {
       const response = await fetch(`/api/digital-signature/${data.nim}`, {
@@ -89,7 +89,7 @@ export default function DataMahasiswa({
     const loadingToast = toast.loading("Submitting data...");
     const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
 
-    const isVerified = verifyDigitalSignature(decryptedData, decryptedData.tanda_tangan, BigInt(kaprodi.prime_number), BigInt(kaprodi.public_key));
+    const isVerified = verifyDigitalSignature(decryptedData, decryptedData.tanda_tangan, BigInt(kaprodi.public_key), BigInt(kaprodi.prime_number));
 
     if (isVerified) {
       toast.success("Signature Verification Success", { id: loadingToast });
