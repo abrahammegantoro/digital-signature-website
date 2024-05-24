@@ -23,7 +23,7 @@ export async function PATCH(
     const updateKaprodi = await prisma.ketuaProgramStudi.update({
       where: { id: parseInt(kaprodiId) },
       data: {
-        prime_number: parseInt(primeNumber),
+        prime_number: primeNumber,
         public_key: publicKeyString,
         private_key: privateKeyString,
       },

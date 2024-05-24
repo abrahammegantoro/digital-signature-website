@@ -16,7 +16,7 @@ datasource db {
 model Mahasiswa {
   nim          String  @id @unique
   nama         String
-  jumlah_sks   String? 
+  jumlah_sks   String?
   ipk          String?
   tanda_tangan String  @default("")
 
@@ -52,11 +52,11 @@ model MataKuliah {
 }
 
 model KetuaProgramStudi {
-  id          Int    @id @default(sequence())
-  nama        String
-  prime_number Int
-  public_key  String
-  private_key String
+  id           Int    @id @default(sequence())
+  nama         String
+  prime_number String
+  public_key   String
+  private_key  String
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
