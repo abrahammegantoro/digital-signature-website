@@ -44,17 +44,25 @@ export const sidebarItems: (SidebarGroup | SidebarItem)[] = [
         title: "Input Mata Kuliah",
         icon: MdClass,
       },
-    ]
+    ],
   },
   {
-    href: "/generate-key",
-    title: "Generate RSA Key",
-    icon: MdKey
+    title: "Generate Key",
+    icon: MdKey,
+    items: [
+      {
+        href: "/generate-key/rsa",
+        title: "RSA Key",
+      },
+      {
+        href: "/generate-key/rc4",
+        title: "RC4 Key",
+      },
+    ],
   },
   {
     href: "/encrypt-decrypt-pdf",
     title: "Encrypt/Decrypt PDF",
-    icon: HiDatabase
+    icon: HiDatabase,
   },
-
 ];

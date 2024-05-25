@@ -4,7 +4,7 @@ import { Button, Label } from "flowbite-react";
 import { FileInput } from "flowbite-react";
 import { decrypt, encrypt } from "@/ciphers/aes";
 
-export default function EncryptDecryptForm() {
+export default function EncryptDecryptForm({ key }: { key: string }) {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +18,7 @@ export default function EncryptDecryptForm() {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const encryptedBuffer = encrypt(buffer);
+      const encryptedBuffer = encrypt(buffer, key);
       downloadFile(encryptedBuffer, `encrypted_${file.name}.pdf`);
     } catch (error) {
       console.error('Encryption error:', error);
@@ -30,7 +30,7 @@ export default function EncryptDecryptForm() {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const decryptedBuffer = decrypt(buffer);
+      const decryptedBuffer = decrypt(buffer, key);
       downloadFile(decryptedBuffer, `decrypted_${file.name}.pdf`);
     } catch (error) {
       console.error('Decryption error:', error);

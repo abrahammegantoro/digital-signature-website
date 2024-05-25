@@ -20,14 +20,25 @@ export async function PATCH(
       );
     }
 
-    const updateKaprodi = await prisma.ketuaProgramStudi.update({
-      where: { id: parseInt(kaprodiId) },
-      data: {
-        prime_number: primeNumber,
-        public_key: publicKeyString,
-        private_key: privateKeyString,
-      },
-    });
+    let updateKaprodi;
+    if (parseInt(kaprodiId) === 0) {
+      updateKaprodi = await prisma.ketuaProgramStudi.update({
+        where: { id: kaprodi.id },
+        data: {
+          public_key: publicKeyString,
+          private_key: privateKeyString,
+        },
+      });
+    } else {
+      updateKaprodi = await prisma.ketuaProgramStudi.update({
+        where: { id: parseInt(kaprodiId) },
+        data: {
+          prime_number: primeNumber,
+          public_key: publicKeyString,
+          private_key: privateKeyString,
+        },
+      });
+    }
 
     return NextResponse.json(
       { message: "Kaprodi Key data submitted successfully", updateKaprodi },

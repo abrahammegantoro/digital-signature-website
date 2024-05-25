@@ -2,22 +2,23 @@ import crypto from 'crypto';
 // import fs from 'fs/promises';
 
 const algorithm = 'aes-256-ctr';
-let key = process.env.NEXT_PUBLIC_RC4_KEY;
 
-key = crypto.createHash('sha256').update(String(key)).digest().slice(0, 32);
+export const encrypt = (buffer, key) => {
+    const finalKey = crypto.createHash('sha256').update(String(key)).digest().slice(0, 32);
 
-export const encrypt = (buffer) => {
     const iv = crypto.randomBytes(16); // Initialization vector
-    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    const cipher = crypto.createCipheriv(algorithm, finalKey, iv);
     const encrypted = Buffer.concat([cipher.update(buffer), cipher.final()]);
 
     return Buffer.concat([iv, encrypted]);
 }
 
-export const decrypt = (encrypted) => {
+export const decrypt = (encrypted, key) => {
+    const finalKey = crypto.createHash('sha256').update(String(key)).digest().slice(0, 32);
+
     const iv = encrypted.slice(0, 16);
     const data = encrypted.slice(16); 
-    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+    const decipher = crypto.createDecipheriv(algorithm, finalKey, iv);
     return Buffer.concat([decipher.update(data), decipher.final()]);
 }
 

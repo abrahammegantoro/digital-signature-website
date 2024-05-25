@@ -4,29 +4,28 @@ import keccakHash from "@/ciphers/sha3";
 
 import { NilaiMahasiswa } from "@/interface/interface";
 
-const VIGENERE_KEY = process.env.NEXT_PUBLIC_VIGENERE_KEY;
-const RC4_KEY = process.env.NEXT_PUBLIC_RC4_KEY;
-
-export function encryptMahasiswaData(nim: string, nama: string) {
-  const encryptedNim = btoa(modifiedRC4Encrypt(nim, VIGENERE_KEY, RC4_KEY));
-  const encryptedNama = btoa(modifiedRC4Encrypt(nama, VIGENERE_KEY, RC4_KEY));
+export function encryptMahasiswaData(nim: string, nama: string, vigenere_key: string, rc4_key: string) {
+  const encryptedNim = btoa(modifiedRC4Encrypt(nim, vigenere_key, rc4_key));
+  const encryptedNama = btoa(modifiedRC4Encrypt(nama, vigenere_key, rc4_key));
   return { encryptedNim, encryptedNama };
 }
 
 export function decryptMahasiswaData(
   encryptedNim: string,
-  encryptedNama: string
+  encryptedNama: string,
+  vigenere_key: string,
+  rc4_key: string
 ) {
-  const nim = modifiedRC4Decrypt(atob(encryptedNim), VIGENERE_KEY, RC4_KEY);
-  const nama = modifiedRC4Decrypt(atob(encryptedNama), VIGENERE_KEY, RC4_KEY);
+  const nim = modifiedRC4Decrypt(atob(encryptedNim), vigenere_key, rc4_key);
+  const nama = modifiedRC4Decrypt(atob(encryptedNama), vigenere_key, rc4_key);
   return { nim, nama };
 }
 
-export function encryptCourseData(kode: string, nama: string, sks: number) {
-  const encryptedKode = btoa(modifiedRC4Encrypt(kode, VIGENERE_KEY, RC4_KEY));
-  const encryptedNama = btoa(modifiedRC4Encrypt(nama, VIGENERE_KEY, RC4_KEY));
+export function encryptCourseData(kode: string, nama: string, sks: number, vigenere_key: string, rc4_key: string) {
+  const encryptedKode = btoa(modifiedRC4Encrypt(kode, vigenere_key, rc4_key));
+  const encryptedNama = btoa(modifiedRC4Encrypt(nama, vigenere_key, rc4_key));
   const encryptedSks = btoa(
-    modifiedRC4Encrypt(sks.toString(), VIGENERE_KEY, RC4_KEY)
+    modifiedRC4Encrypt(sks.toString(), vigenere_key, rc4_key)
   );
   return { encryptedKode, encryptedNama, encryptedSks };
 }
@@ -34,42 +33,46 @@ export function encryptCourseData(kode: string, nama: string, sks: number) {
 export function decryptCourseData(
   encryptedKode: string,
   encryptedNama: string,
-  encryptedSks: string
+  encryptedSks: string,
+  vigenere_key: string,
+  rc4_key: string
 ) {
-  const kode = modifiedRC4Decrypt(atob(encryptedKode), VIGENERE_KEY, RC4_KEY);
-  const nama = modifiedRC4Decrypt(atob(encryptedNama), VIGENERE_KEY, RC4_KEY);
+  const kode = modifiedRC4Decrypt(atob(encryptedKode), vigenere_key, rc4_key);
+  const nama = modifiedRC4Decrypt(atob(encryptedNama), vigenere_key, rc4_key);
   const sks = Number(
-    modifiedRC4Decrypt(atob(encryptedSks), VIGENERE_KEY, RC4_KEY)
+    modifiedRC4Decrypt(atob(encryptedSks), vigenere_key, rc4_key)
   );
   return { kode, nama, sks };
 }
 
-export function encryptScoreData(kode: string, nilai: string) {
-  const encryptedKode = btoa(modifiedRC4Encrypt(kode, VIGENERE_KEY, RC4_KEY));
-  const encryptedNilai = btoa(modifiedRC4Encrypt(nilai, VIGENERE_KEY, RC4_KEY));
+export function encryptScoreData(kode: string, nilai: string, vigenere_key: string, rc4_key: string) {
+  const encryptedKode = btoa(modifiedRC4Encrypt(kode, vigenere_key, rc4_key));
+  const encryptedNilai = btoa(modifiedRC4Encrypt(nilai, vigenere_key, rc4_key));
   return { encryptedKode, encryptedNilai };
 }
 
 export function decryptScoreData(
   encryptedKode: string,
-  encryptedNilai: string
+  encryptedNilai: string,
+  vigenere_key: string,
+  rc4_key: string
 ) {
-  const kode = modifiedRC4Decrypt(atob(encryptedKode), VIGENERE_KEY, RC4_KEY);
-  const nilai = modifiedRC4Decrypt(atob(encryptedNilai), VIGENERE_KEY, RC4_KEY);
+  const kode = modifiedRC4Decrypt(atob(encryptedKode), vigenere_key, rc4_key);
+  const nilai = modifiedRC4Decrypt(atob(encryptedNilai), vigenere_key, rc4_key);
   return { kode, nilai };
 }
 
-export function encryptIpkData(ipk: number) {
-  return btoa(modifiedRC4Encrypt(ipk.toString(), VIGENERE_KEY, RC4_KEY));
+export function encryptIpkData(ipk: number, vigenere_key: string, rc4_key: string) {
+  return btoa(modifiedRC4Encrypt(ipk.toString(), vigenere_key, rc4_key));
 }
 
-export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[]): any {
+export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[], vigenere_key: string, rc4_key: string): any {
   const decryptMahasiswa = (mahasiswa: NilaiMahasiswa) => {
     const decryptedFields = {
-      nim: modifiedRC4Decrypt(atob(mahasiswa.nim), VIGENERE_KEY, RC4_KEY),
-      nama: modifiedRC4Decrypt(atob(mahasiswa.nama), VIGENERE_KEY, RC4_KEY),
+      nim: modifiedRC4Decrypt(atob(mahasiswa.nim), vigenere_key, rc4_key),
+      nama: modifiedRC4Decrypt(atob(mahasiswa.nama), vigenere_key, rc4_key),
       tanda_tangan: mahasiswa.tanda_tangan.map((el) => {
-        return modifiedRC4Decrypt(atob(el), VIGENERE_KEY, RC4_KEY);
+        return modifiedRC4Decrypt(atob(el), vigenere_key, rc4_key);
       }),
     };
 
@@ -80,10 +83,10 @@ export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[]): a
       const sks = mahasiswa[`sks_${index + 1}` as keyof NilaiMahasiswa];
 
       return {
-        [`kode_mk_${index + 1}`]: kode !== '-' ? modifiedRC4Decrypt(atob(kode.toString()), VIGENERE_KEY, RC4_KEY) : '-',
-        [`nama_matkul_${index + 1}`]: nama !== '-' ? modifiedRC4Decrypt(atob(nama.toString()), VIGENERE_KEY, RC4_KEY) : '-',
-        [`nilai_${index + 1}`]: nilai !== '-' ? modifiedRC4Decrypt(atob(nilai.toString()), VIGENERE_KEY, RC4_KEY) : '-',
-        [`sks_${index + 1}`]: sks !== '-' ? Number(modifiedRC4Decrypt(atob(sks.toString()), VIGENERE_KEY, RC4_KEY)) : '-',
+        [`kode_mk_${index + 1}`]: kode !== '-' ? modifiedRC4Decrypt(atob(kode.toString()), vigenere_key, rc4_key) : '-',
+        [`nama_matkul_${index + 1}`]: nama !== '-' ? modifiedRC4Decrypt(atob(nama.toString()), vigenere_key, rc4_key) : '-',
+        [`nilai_${index + 1}`]: nilai !== '-' ? modifiedRC4Decrypt(atob(nilai.toString()), vigenere_key, rc4_key) : '-',
+        [`sks_${index + 1}`]: sks !== '-' ? Number(modifiedRC4Decrypt(atob(sks.toString()), vigenere_key, rc4_key)) : '-',
       };
     });
 
@@ -95,7 +98,7 @@ export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[]): a
     return {
       ...decryptedFields,
       ...flattenedDecryptedNilaiFields,
-      ipk: modifiedRC4Decrypt(atob(mahasiswa.ipk), VIGENERE_KEY, RC4_KEY),
+      ipk: modifiedRC4Decrypt(atob(mahasiswa.ipk), vigenere_key, rc4_key),
     };
   };
 
@@ -109,7 +112,9 @@ export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[]): a
 export function assignDigitalSignature(
   data: NilaiMahasiswa,
   privateKey: bigint,
-  primeNumber: bigint
+  primeNumber: bigint,
+  vigenere_key: string,
+  rc4_key: string
 ) {
   const dataString = Object.keys(data)
     .filter(
@@ -131,7 +136,7 @@ export function assignDigitalSignature(
       privateKey,
       primeNumber
     );
-    digitalSignature.push(btoa(modifiedRC4Encrypt(encryptedChar.toString(), VIGENERE_KEY, RC4_KEY)));
+    digitalSignature.push(btoa(modifiedRC4Encrypt(encryptedChar.toString(), vigenere_key, rc4_key)));
   }
   
   return digitalSignature;
