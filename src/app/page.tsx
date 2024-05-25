@@ -51,13 +51,19 @@ const getNilaiMahasiswa = async () => {
 
 const getKaprodi = async () => {
   try {
-    const result = await prisma.ketuaProgramStudi.findFirst();
+    const result = await prisma.ketuaProgramStudi.findFirst({
+      where: {
+        nama: {
+          not: "dummy",
+        },
+      },
+    });
 
     return result;
   } catch (error) {
     console.error("Error getting data:", error);
   }
-}
+};
 
 export default async function Home() {
   const dataMahasiswa = await getNilaiMahasiswa();
