@@ -13,20 +13,29 @@ import { set } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { generateTranscript } from "@/utils/generateTranscript";
+import { useKaprodiContext } from "@/context/KaprodiProviders";
 
 export default function DataMahasiswa({
   nilaiMahasiswaEncrypt,
   nilaiMahasiswaDecrypt,
-  kaprodi,
+  listKaprodi,
 }: {
   nilaiMahasiswaEncrypt: NilaiMahasiswa[];
   nilaiMahasiswaDecrypt: NilaiMahasiswa[];
-  kaprodi: KetuaProgramStudi;
+  listKaprodi: KetuaProgramStudi[];
 }) {
   const router = useRouter();
 
   const [isDataEncrypted, setIsDataEncrypted] = useState(true);
   const [isSignatureEncrypted, setIsSignatureEncrypted] = useState(true);
+
+  const { kaprodi: idKaprodi } = useKaprodiContext();
+  
+  const kaprodi = listKaprodi.find((kaprodi) => kaprodi.id === idKaprodi);
+
+  if (!kaprodi) {
+    return null;
+  }
 
   const mahasiswaEncrypt = nilaiMahasiswaEncrypt.map((mahasiswa) => {
     const { tanda_tangan, ...rest } = mahasiswa;
@@ -112,9 +121,9 @@ export default function DataMahasiswa({
     }
   };
 
-  const handleDownload = async (data: NilaiMahasiswa) => {
+  const handleDownload = async (index: number) => {
     const loadingToast = toast.loading("Submitting data...");
-    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
+    const decryptedData = nilaiMahasiswaDecrypt[index];
     try {
       const pdfBytes = await generateTranscript(decryptedData);
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
@@ -152,8 +161,8 @@ export default function DataMahasiswa({
         items={dataShown}
         totalItemsCount={100}
         disableCheckboxes
-        onDownload={(data) => {
-          handleDownload(data);
+        onDownload={(index) => {
+          handleDownload(index);
         }}
         onAssign={(index) => {
           handleAssign(index);

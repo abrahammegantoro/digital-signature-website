@@ -2,6 +2,7 @@ import { NilaiMahasiswa } from "@/interface/interface";
 import DataMahasiswa from "./components/DataMahasiswa";
 import { prisma } from "@/lib/prisma";
 import { decryptDataMahasiswa } from "@/utils/cipher";
+import { useKaprodiContext } from "@/context/KaprodiProviders";
 
 const getNilaiMahasiswa = async () => {
   try {
@@ -51,7 +52,7 @@ const getNilaiMahasiswa = async () => {
 
 const getKaprodi = async () => {
   try {
-    const result = await prisma.ketuaProgramStudi.findFirst({
+    const result = await prisma.ketuaProgramStudi.findMany({
       where: {
         nama: {
           not: "dummy",
@@ -80,7 +81,7 @@ export default async function Home() {
       <DataMahasiswa
         nilaiMahasiswaEncrypt={dataMahasiswa}
         nilaiMahasiswaDecrypt={dataDecrypted}
-        kaprodi={dataKaprodi}
+        listKaprodi={dataKaprodi}
       />
     </div>
   );

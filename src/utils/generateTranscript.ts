@@ -75,7 +75,7 @@ async function generateTranscript(data: NilaiMahasiswa) {
 
   drawText("Ketua Program Studi", margin, y - 70);
   drawText("--Begin signature--", margin, y - 90);
-  drawText(data.tanda_tangan, margin, y - 105);
+  drawText(data.tanda_tangan.join(''), margin, y - 105);
   drawText("--End signature--", margin, y - 120);
   drawText(`(Dr. I Gusti Bagus Baskara)`, margin, y - 140);
 

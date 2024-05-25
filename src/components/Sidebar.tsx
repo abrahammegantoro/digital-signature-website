@@ -1,3 +1,5 @@
+"use client";
+
 import classNames from "classnames";
 import { Sidebar, TextInput } from "flowbite-react";
 import type { FC } from "react";
