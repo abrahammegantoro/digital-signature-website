@@ -50,7 +50,7 @@ interface Props<T> extends TableProps {
     disableVerify?: boolean;
     disableDownload?: boolean;
     onVerify?: (data: number) => any;
-    onDownload?: (data: T) => any;
+    onDownload?: (data: number) => any;
     onAssign?: (data: number) => any;
     onAdd?: (data: T) => any;
     showKeys?: boolean;
@@ -278,7 +278,7 @@ export default function DSDataTable<T>(props: Props<T>) {
                                                     {!disableDownload && onDownload && (
                                                         <Button
                                                             color="success"
-                                                            onClick={() => onDownload(item)}
+                                                            onClick={() => onDownload(index)}
                                                         >
                                                             Download Report
                                                         </Button>

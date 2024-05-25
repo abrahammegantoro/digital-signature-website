@@ -12,18 +12,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { generateTranscript } from "@/utils/generateTranscript";
+import { useKaprodiContext } from "@/context/KaprodiProviders";
 import DSTextField from "@/components/DSTextField";
 
 export default function DataMahasiswa({
   nilaiMahasiswaEncrypt,
   nilaiMahasiswaDecrypt,
-  kaprodi,
+  listKaprodi,
   public_key,
   private_key
 }: {
   nilaiMahasiswaEncrypt: NilaiMahasiswa[];
   nilaiMahasiswaDecrypt: NilaiMahasiswa[];
-  kaprodi: KetuaProgramStudi;
+  listKaprodi: KetuaProgramStudi[];
   public_key: string;
   private_key: string;
 }) {
@@ -35,6 +36,14 @@ export default function DataMahasiswa({
   const [toggleType, setToggleType] = useState("")
   const [rc4Key, setRc4Key] = useState("");
   const [vigenereKey, setVigenereKey] = useState("");
+
+  const { kaprodi: idKaprodi } = useKaprodiContext();
+  
+  const kaprodi = listKaprodi.find((kaprodi) => kaprodi.id === idKaprodi);
+
+  if (!kaprodi) {
+    return null;
+  }
 
   const mahasiswaEncrypt = nilaiMahasiswaEncrypt.map((mahasiswa) => {
     const { tanda_tangan, ...rest } = mahasiswa;
@@ -122,9 +131,9 @@ export default function DataMahasiswa({
     }
   };
 
-  const handleDownload = async (data: NilaiMahasiswa) => {
+  const handleDownload = async (index: number) => {
     const loadingToast = toast.loading("Submitting data...");
-    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data, private_key, public_key) : data;
+    const decryptedData = nilaiMahasiswaDecrypt[index];
     try {
       const pdfBytes = await generateTranscript(decryptedData);
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
@@ -166,6 +175,8 @@ export default function DataMahasiswa({
     }
     
     toast.success("Keys submitted successfully");
+    setRc4Key("");
+    setVigenereKey("");
     setOpenKeyModal(false);
   };
 
@@ -188,8 +199,8 @@ export default function DataMahasiswa({
         items={dataShown}
         totalItemsCount={100}
         disableCheckboxes
-        onDownload={(data) => {
-          handleDownload(data);
+        onDownload={(index) => {
+          handleDownload(index);
         }}
         onAssign={(index) => {
           handleAssign(index);

@@ -1,23 +1,27 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import type { FC } from "react";
-import {
-  DarkThemeToggle,
-  Label,
-  Navbar,
-  TextInput,
-} from "flowbite-react";
-import {
-  HiMenuAlt1,
-  HiSearch,
-  HiX,
-} from "react-icons/hi";
+"use client";
+import { useContext, type FC } from "react";
+import { DarkThemeToggle, Label, Navbar, TextInput } from "flowbite-react";
+import { HiMenuAlt1, HiSearch, HiX } from "react-icons/hi";
 import { useSidebarContext } from "../context/SidebarContext";
 import isSmallScreen from "../helpers/is-small-screen";
 import Image from "next/image";
+import { useKaprodiContext } from "@/context/KaprodiProviders";
+import DSSelect from "./DSSelect";
 
-const ExampleNavbar: FC = function () {
+type ResponseType = {
+  [key: string]: string;
+};
+
+const ExampleNavbar = function ({
+  listKaprodi,
+}: {
+  listKaprodi: ResponseType;
+}) {
   const { isOpenOnSmallScreens, isPageWithSidebar, setOpenOnSmallScreens } =
     useSidebarContext();
+
+  const { kaprodi, setKaprodi } = useKaprodiContext();
 
   return (
     <Navbar fluid>
@@ -46,14 +50,13 @@ const ExampleNavbar: FC = function () {
               <Label htmlFor="search" className="sr-only">
                 Search
               </Label>
-              <TextInput
-                icon={HiSearch}
-                id="search"
-                name="search"
-                placeholder="Search"
+              <DSSelect
+                id="bits"
+                options={listKaprodi}
+                onChange={(e) => setKaprodi(parseInt(e.target.value))}
+                value={kaprodi}
+                placeholder="Pilih Ketua Program Studi"
                 required
-                size={32}
-                type="search"
               />
             </form>
           </div>

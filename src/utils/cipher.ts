@@ -161,7 +161,6 @@ export function verifyDigitalSignature(
     .join("");
 
   const hashedMessage = keccakHash(dataString);
-  console.log(hashedMessage);
 
   let decryptedMessage = "";
   for (let i = 0; i < digitalSignature.length; i++) {
