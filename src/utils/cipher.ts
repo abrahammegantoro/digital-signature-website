@@ -1,6 +1,6 @@
 import { modifiedRC4Decrypt, modifiedRC4Encrypt } from "@/ciphers/modified_rc4";
 import { crypt } from "@/ciphers/rsa";
-import keccakHash from "@/ciphers/sha3";
+import { keccakHash } from "@/ciphers/sha3";
 
 import { NilaiMahasiswa } from "@/interface/interface";
 
@@ -78,7 +78,8 @@ export function decryptDataMahasiswa(data: NilaiMahasiswa | NilaiMahasiswa[], vi
 
     const decryptedNilaiFields = Array.from({ length: 10 }, (_, index) => {
       const kode = mahasiswa[`kode_mk_${index + 1}` as keyof NilaiMahasiswa];
-      const nama = mahasiswa[`nama_matkul_${index + 1}` as keyof NilaiMahasiswa];
+      const nama =
+        mahasiswa[`nama_matkul_${index + 1}` as keyof NilaiMahasiswa];
       const nilai = mahasiswa[`nilai_${index + 1}` as keyof NilaiMahasiswa];
       const sks = mahasiswa[`sks_${index + 1}` as keyof NilaiMahasiswa];
 
@@ -138,14 +139,14 @@ export function assignDigitalSignature(
     );
     digitalSignature.push(btoa(modifiedRC4Encrypt(encryptedChar.toString(), vigenere_key, rc4_key)));
   }
-  
+
   return digitalSignature;
 }
 
 export function verifyDigitalSignature(
   data: NilaiMahasiswa,
   publicKey: bigint,
-  primeNumber: bigint,
+  primeNumber: bigint
 ) {
   const digitalSignature = data.tanda_tangan;
   const dataString = Object.keys(data)
@@ -160,6 +161,7 @@ export function verifyDigitalSignature(
     .join("");
 
   const hashedMessage = keccakHash(dataString);
+  console.log(hashedMessage);
 
   let decryptedMessage = "";
   for (let i = 0; i < digitalSignature.length; i++) {
@@ -170,6 +172,6 @@ export function verifyDigitalSignature(
     );
     decryptedMessage += String.fromCharCode(Number(decryptedChar));
   }
-  
+
   return hashedMessage === decryptedMessage;
 }
