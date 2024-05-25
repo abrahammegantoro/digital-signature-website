@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import { generateTranscript } from "@/utils/generateTranscript";
 import { useKaprodiContext } from "@/context/KaprodiProviders";
 import DSTextField from "@/components/DSTextField";
+import { encrypt } from "@/ciphers/aes";
 
 export default function DataMahasiswa({
   nilaiMahasiswaEncrypt,
@@ -186,12 +187,12 @@ export default function DataMahasiswa({
         <ToggleSwitch
           label="Encrypt Data Mahasiswa"
           checked={isDataEncrypted}
-          onChange={(checked: boolean) => setIsDataEncrypted(checked)}
+          onChange={(checked: boolean) => handleToggleEncryption("data")}
         />
         <ToggleSwitch
           label="Encrypt Tanda Tangan"
           checked={isSignatureEncrypted}
-          onChange={(checked: boolean) => setIsSignatureEncrypted(checked)}
+          onChange={(checked: boolean) => handleToggleEncryption("signature")}
         />
       </div>
       <DSDataTable

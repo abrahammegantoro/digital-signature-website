@@ -93,9 +93,11 @@ export default async function Home() {
     return <div>Failed to fetch data</div>;
   }
 
-  console.log(dataKey.public_key, dataKey.private_key)
-
   const dataDecrypted = decryptDataMahasiswa(dataMahasiswa, dataKey.private_key, dataKey.public_key);
+
+  if (dataMahasiswa.length === 0) {
+    return <div className="text-black dark:text-gray-300">No data available</div>;
+  }
 
   return (
     <div className="w-full">

@@ -8,6 +8,11 @@ const getKaprodi = async () => {
         id: true,
         nama: true,
       },
+      where: {
+        nama: {
+          not: "dummy",
+        },
+      }
     });
 
     const kaprodiDict = result.reduce((acc, curr) => {

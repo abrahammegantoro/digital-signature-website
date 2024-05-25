@@ -82,7 +82,7 @@ export default function GenerateKeyForm({
           onChange={(e) => setBits(parseInt(e.target.value))}
           placeholder="Enter number of bits"
           required
-          min={256}
+          min={16}
           max={4096}
         />
         <Button type="submit">Generate Key</Button>

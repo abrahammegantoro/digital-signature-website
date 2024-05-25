@@ -1,6 +1,14 @@
 import { NilaiMahasiswa } from "@/interface/interface";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
+function splitTextIntoLines(text: string, maxLength: number): string[] {
+  const lines: string[] = [];
+  for (let i = 0; i < text.length; i += maxLength) {
+    lines.push(text.substring(i, i + maxLength));
+  }
+  return lines;
+}
+
 async function generateTranscript(data: NilaiMahasiswa, kaprodi: string) {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
@@ -9,6 +17,13 @@ async function generateTranscript(data: NilaiMahasiswa, kaprodi: string) {
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
   const fontSize = 12;
   const margin = 50;
+
+  const maxLength = 80; 
+
+  const tandaTanganLines = splitTextIntoLines(
+    data.tanda_tangan.join(""),
+    maxLength
+  );
 
   const drawText = (
     text: string,
@@ -75,9 +90,11 @@ async function generateTranscript(data: NilaiMahasiswa, kaprodi: string) {
 
   drawText("Ketua Program Studi", margin, y - 70);
   drawText("--Begin signature--", margin, y - 90);
-  drawText(data.tanda_tangan.join(''), margin, y - 105);
-  drawText("--End signature--", margin, y - 120);
-  drawText(`(${kaprodi})`, margin, y - 140);
+  tandaTanganLines.forEach((line, index) => {
+    drawText(line, margin, y - 105 - (index * 15));
+  });
+  drawText("--End signature--", margin, y - 225);
+  drawText(`(${kaprodi})`, margin, y - 245);
 
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
