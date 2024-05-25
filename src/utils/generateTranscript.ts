@@ -1,7 +1,7 @@
 import { NilaiMahasiswa } from "@/interface/interface";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
-async function generateTranscript(data: NilaiMahasiswa) {
+async function generateTranscript(data: NilaiMahasiswa, kaprodi: string) {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
   const { width, height } = page.getSize();
@@ -77,7 +77,7 @@ async function generateTranscript(data: NilaiMahasiswa) {
   drawText("--Begin signature--", margin, y - 90);
   drawText(data.tanda_tangan.join(''), margin, y - 105);
   drawText("--End signature--", margin, y - 120);
-  drawText(`(Dr. I Gusti Bagus Baskara)`, margin, y - 140);
+  drawText(`(${kaprodi})`, margin, y - 140);
 
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;

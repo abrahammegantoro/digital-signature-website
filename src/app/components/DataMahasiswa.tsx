@@ -135,7 +135,7 @@ export default function DataMahasiswa({
     const loadingToast = toast.loading("Submitting data...");
     const decryptedData = nilaiMahasiswaDecrypt[index];
     try {
-      const pdfBytes = await generateTranscript(decryptedData);
+      const pdfBytes = await generateTranscript(decryptedData, kaprodi.nama);
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
