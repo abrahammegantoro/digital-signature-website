@@ -186,12 +186,12 @@ export default function DataMahasiswa({
         <ToggleSwitch
           label="Encrypt Data Mahasiswa"
           checked={isDataEncrypted}
-          onChange={(checked: boolean) => handleToggleEncryption("data")}
+          onChange={(checked: boolean) => setIsDataEncrypted(checked)}
         />
         <ToggleSwitch
           label="Encrypt Tanda Tangan"
           checked={isSignatureEncrypted}
-          onChange={(checked: boolean) => handleToggleEncryption("signature")}
+          onChange={(checked: boolean) => setIsSignatureEncrypted(checked)}
         />
       </div>
       <DSDataTable
