@@ -65,15 +65,34 @@ const getKaprodi = async () => {
   }
 };
 
+const getKey = async () => {
+  try {
+    const result = await prisma.ketuaProgramStudi.findUnique({
+      where: {
+        id: 0,
+      },
+      select: {
+        public_key: true,
+        private_key: true
+      },
+    });
+
+    return result;
+  } catch (error) {
+    console.error("Error getting data:", error);
+  }
+}
+
 export default async function Home() {
   const dataMahasiswa = await getNilaiMahasiswa();
   const dataKaprodi = await getKaprodi();
+  const dataKey = await getKey();
 
-  if (!dataMahasiswa || !dataKaprodi) {
+  if (!dataMahasiswa || !dataKaprodi || !dataKey) {
     return <div>Failed to fetch data</div>;
   }
 
-  const dataDecrypted = decryptDataMahasiswa(dataMahasiswa);
+  const dataDecrypted = decryptDataMahasiswa(dataMahasiswa, dataKey.private_key, dataKey.public_key);
 
   return (
     <div className="w-full">
@@ -81,6 +100,8 @@ export default async function Home() {
         nilaiMahasiswaEncrypt={dataMahasiswa}
         nilaiMahasiswaDecrypt={dataDecrypted}
         kaprodi={dataKaprodi}
+        public_key={dataKey.public_key}
+        private_key={dataKey.private_key}
       />
     </div>
   );

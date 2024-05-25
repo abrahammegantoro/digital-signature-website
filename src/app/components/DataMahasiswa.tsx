@@ -9,24 +9,32 @@ import {
 import { KetuaProgramStudi } from "@prisma/client";
 import { Button, Modal, ToggleSwitch } from "flowbite-react";
 import { useState } from "react";
-import { set } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { generateTranscript } from "@/utils/generateTranscript";
+import DSTextField from "@/components/DSTextField";
 
 export default function DataMahasiswa({
   nilaiMahasiswaEncrypt,
   nilaiMahasiswaDecrypt,
   kaprodi,
+  public_key,
+  private_key
 }: {
   nilaiMahasiswaEncrypt: NilaiMahasiswa[];
   nilaiMahasiswaDecrypt: NilaiMahasiswa[];
   kaprodi: KetuaProgramStudi;
+  public_key: string;
+  private_key: string;
 }) {
   const router = useRouter();
 
   const [isDataEncrypted, setIsDataEncrypted] = useState(true);
   const [isSignatureEncrypted, setIsSignatureEncrypted] = useState(true);
+  const [openKeyModal, setOpenKeyModal] = useState(false);
+  const [toggleType, setToggleType] = useState("")
+  const [rc4Key, setRc4Key] = useState("");
+  const [vigenereKey, setVigenereKey] = useState("");
 
   const mahasiswaEncrypt = nilaiMahasiswaEncrypt.map((mahasiswa) => {
     const { tanda_tangan, ...rest } = mahasiswa;
@@ -72,7 +80,9 @@ export default function DataMahasiswa({
     const digitalSignature = assignDigitalSignature(
       nilaiMahasiswaDecrypt[index],
       BigInt(kaprodi.private_key),
-      BigInt(kaprodi.prime_number)
+      BigInt(kaprodi.prime_number),
+      private_key,
+      public_key
     );
 
     try {
@@ -114,7 +124,7 @@ export default function DataMahasiswa({
 
   const handleDownload = async (data: NilaiMahasiswa) => {
     const loadingToast = toast.loading("Submitting data...");
-    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data) : data;
+    const decryptedData = isDataEncrypted ? decryptDataMahasiswa(data, private_key, public_key) : data;
     try {
       const pdfBytes = await generateTranscript(decryptedData);
       const blob = new Blob([pdfBytes], { type: "application/pdf" });
@@ -133,18 +143,44 @@ export default function DataMahasiswa({
     }
   };
 
+  const handleToggleEncryption = (type: string) => {
+    setToggleType(type);
+    setOpenKeyModal(true);
+  };
+
+  const handleSubmitKeys = () => {
+    if (!rc4Key || !vigenereKey) {
+      toast.error("Please fill in the keys");
+      return;
+    }
+
+    if (rc4Key !== public_key || vigenereKey !== private_key) {
+      toast.error("Invalid keys");
+      return;
+    }
+
+    if (toggleType === "data") {
+      setIsDataEncrypted(!isDataEncrypted);
+    } else {
+      setIsSignatureEncrypted(!isSignatureEncrypted);
+    }
+    
+    toast.success("Keys submitted successfully");
+    setOpenKeyModal(false);
+  };
+
   return (
     <div className="w-full">
       <div className="flex justify-end gap-4 mb-5">
         <ToggleSwitch
           label="Encrypt Data Mahasiswa"
           checked={isDataEncrypted}
-          onChange={setIsDataEncrypted}
+          onChange={(checked: boolean) => handleToggleEncryption("data")}
         />
         <ToggleSwitch
           label="Encrypt Tanda Tangan"
           checked={isSignatureEncrypted}
-          onChange={setIsSignatureEncrypted}
+          onChange={(checked: boolean) => handleToggleEncryption("signature")}
         />
       </div>
       <DSDataTable
@@ -184,6 +220,30 @@ export default function DataMahasiswa({
           ),
         }}
       />
+
+<Modal show={openKeyModal} onClose={() => setOpenKeyModal(false)}>
+        <Modal.Header>Enter Encryption Keys</Modal.Header>
+        <Modal.Body>
+          <div className="space-y-4">
+            <DSTextField
+              label="RC4 Key"
+              value={rc4Key}
+              onChange={(e) => setRc4Key(e.target.value)}
+              required
+            />
+            <DSTextField
+              label="Vigenere Key"
+              value={vigenereKey}
+              onChange={(e) => setVigenereKey(e.target.value)}
+              required
+            />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleSubmitKeys}>Submit</Button>
+          <Button color="gray" onClick={() => setOpenKeyModal(false)}>Cancel</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

@@ -6,7 +6,24 @@ export async function POST(req: NextRequest) {
   try {
     const { kode, nama, sks } = await req.json();
 
-    const { encryptedKode, encryptedNama, encryptedSks } = encryptCourseData(kode, nama, sks);
+    const key = await prisma.ketuaProgramStudi.findUnique({
+      where: {
+        id: 0,
+      },
+      select: {
+        public_key: true,
+        private_key: true
+      },
+    });
+
+    if (!key) {
+      return NextResponse.json(
+        { error: "Key not found" },
+        { status: 404 }
+      );
+    }
+
+    const { encryptedKode, encryptedNama, encryptedSks } = encryptCourseData(kode, nama, sks, key.private_key, key.public_key);
 
     const student = await prisma.mataKuliah.create({
       data: {

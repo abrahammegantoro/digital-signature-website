@@ -1,12 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { encryptIpkData, encryptMahasiswaData, encryptScoreData } from "@/utils/cipher";
+import {
+  encryptIpkData,
+  encryptMahasiswaData,
+  encryptScoreData,
+} from "@/utils/cipher";
 
 export async function POST(req: NextRequest) {
   try {
     const { nim, matkul, ipk } = await req.json();
 
-    const encryptedNim = encryptMahasiswaData(nim, "dummy").encryptedNim;
+    const key = await prisma.ketuaProgramStudi.findUnique({
+      where: {
+        id: 0,
+      },
+      select: {
+        public_key: true,
+        private_key: true,
+      },
+    });
+
+    if (!key) {
+      return NextResponse.json({ error: "Key not found" }, { status: 404 });
+    }
+
+    const encryptedNim = encryptMahasiswaData(
+      nim,
+      "dummy",
+      key.private_key,
+      key.public_key
+    ).encryptedNim;
 
     const mahasiswaExist = await prisma.mahasiswa.findUnique({
       where: {
@@ -28,7 +51,12 @@ export async function POST(req: NextRequest) {
     });
 
     const nilaiRecords = matkul.map((mk: { kode: string; nilai: string }) => {
-      const { encryptedKode, encryptedNilai } = encryptScoreData(mk.kode, mk.nilai);
+      const { encryptedKode, encryptedNilai } = encryptScoreData(
+        mk.kode,
+        mk.nilai,
+        key.private_key,
+        key.public_key
+      );
       return {
         nim: encryptedNim,
         kode_mata_kuliah: encryptedKode,
@@ -40,7 +68,7 @@ export async function POST(req: NextRequest) {
       data: nilaiRecords,
     });
 
-    const encryptedIpk = encryptIpkData(ipk);
+    const encryptedIpk = encryptIpkData(ipk, key.private_key, key.public_key);
     const newIpk = await prisma.mahasiswa.update({
       where: {
         nim: encryptedNim,
